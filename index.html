@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Morning">
+<title>Morning</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%230A5EA8'/><circle cx='90' cy='100' r='38' fill='%23F2C14E'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ------------------------------------------------------------------
+   SETTINGS live in the CONFIG block in the <script> at the bottom.
+   ------------------------------------------------------------------ */
+:root{
+  --bg:#E9EEF1; --panel:#F6F8F9; --ink:#15222C; --soft:#5A6873; --faint:#A3AEB6; --rule:#D3DBE0;
+  --blue:#0A5EA8; --good:#23845A; --warn:#B9790A; --bad:#B3342B;
+  --num:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",-apple-system,"Segoe UI",system-ui,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#101820; --panel:#17222C; --ink:#E7EDF1; --soft:#93A1AC; --faint:#56646F; --rule:#24323D;
+         --blue:#5BA4E6; --good:#4CC28A; --warn:#E3A73A; --bad:#EE6B5F; }
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.45 var(--body);-webkit-font-smoothing:antialiased}
+main{max-width:520px;margin:0 auto;padding:20px 18px 40px}
+a{color:inherit}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* Header + weather */
+.date{font:600 15px/1 var(--body);color:var(--soft);margin:6px 0 10px}
+.wx-now{display:flex;align-items:flex-end;gap:14px}
+.wx-temp{font:600 88px/.82 var(--num);letter-spacing:-.02em}
+.wx-meta{padding-bottom:4px}
+.wx-cond{font:600 20px/1.15 var(--body)}
+.wx-sub{color:var(--soft);font-size:15px}
+.wx-line{margin:12px 0 0;font-size:16px}
+.hours{display:flex;gap:0;margin:16px -18px 0;padding:0 18px;overflow-x:auto;scrollbar-width:none}
+.hours::-webkit-scrollbar{display:none}
+.hr{flex:0 0 auto;width:50px;text-align:center}
+.hr-t{font-size:12px;color:var(--soft)}
+.hr-temp{font:600 20px/1.3 var(--num)}
+.hr-bar{height:34px;display:flex;align-items:flex-end;justify-content:center}
+.hr-bar span{width:16px;background:var(--blue);opacity:.75;border-radius:2px 2px 0 0;min-height:1px}
+.hr-p{font-size:11px;color:var(--soft);height:15px}
+
+/* Sections */
+section{margin-top:34px}
+h2{font:600 15px/1 var(--body);color:var(--soft);margin:0 0 12px;letter-spacing:.01em}
+
+/* Bikes: the hero */
+.ride{background:var(--panel);border-radius:14px;padding:18px 18px 8px}
+.ride + .ride{margin-top:10px}
+.ride-label{font-size:14px;color:var(--soft)}
+.ride-station{font:600 18px/1.2 var(--body);margin:2px 0 12px}
+.big{display:flex;gap:26px;align-items:flex-end;margin-bottom:14px}
+.big-n{font:700 76px/.8 var(--num)}
+.big-l{font-size:14px;color:var(--soft);margin-top:6px}
+.near{border-top:1px solid var(--rule);padding:8px 0}
+.near-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:15px}
+.near-name{display:flex;min-width:0;gap:6px;align-items:baseline}
+.near-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.near-name small{color:var(--soft);font-size:13px;white-space:nowrap}
+.near-val{font:600 19px/1 var(--num);white-space:nowrap}
+.bus-times{display:flex;gap:18px;align-items:flex-end;margin-bottom:12px}
+.bus-times .big-n,.bus-times .near-val{white-space:nowrap}
+.bus-sub{font-size:13px;color:var(--soft);margin-top:6px}
+.bus-min{font:500 15px/1 var(--body);color:var(--soft)}
+.good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)} .off{color:var(--faint)}
+
+/* Rows (crypto, teams) */
+.rows{border-top:1px solid var(--rule)}
+.row{display:grid;grid-template-columns:1fr auto 64px;gap:2px 14px;padding:11px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.row-k{font:600 17px/1.2 var(--body)}
+.row-k small{font-weight:400;color:var(--soft);font-size:14px;margin-left:6px}
+.row-v{font:600 22px/1 var(--num);text-align:right}
+.row-d{text-align:right;font:600 15px/1 var(--num)}
+.up{color:var(--good)} .down{color:var(--bad)}
+.team{display:block}
+.team .row-k{margin-bottom:3px}
+.game{display:flex;flex-direction:column;gap:2px;font-size:15px;color:var(--soft)}
+.game b{color:var(--ink);font-weight:600}
+.res{font:700 17px/1 var(--num);margin-right:4px}
+.live{color:var(--bad);font-weight:600}
+
+.msg{color:var(--soft);font-size:15px;padding:8px 0}
+.skel{color:var(--faint)}
+
+footer{margin-top:34px;display:flex;justify-content:space-between;align-items:center;color:var(--soft);font-size:14px}
+.refresh{background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer}
+.refresh[disabled]{opacity:.5}
+@media (prefers-reduced-motion:no-preference){ .fresh{animation:pulse .5s ease-out} @keyframes pulse{from{opacity:.4}to{opacity:1}} }
+</style>
+</head>
+<body>
+<main>
+  <div class="date" id="date"></div>
+
+  <div id="wx"><div class="wx-now"><div class="wx-temp skel">--°</div></div></div>
+
+  <section aria-labelledby="h-ride">
+    <h2 id="h-ride">Getting to work</h2>
+    <div class="ride" id="home"><div class="msg">Checking your stop…</div></div>
+    <div class="ride" id="bus"><div class="msg">Checking the bus…</div></div>
+    <div class="ride" id="work"><div class="msg">Checking docks near work…</div></div>
+  </section>
+
+  <section aria-labelledby="h-coins">
+    <h2 id="h-coins">Crypto, 24h change</h2>
+    <div class="rows" id="coins"><div class="msg">Loading prices…</div></div>
+  </section>
+
+  <section aria-labelledby="h-teams">
+    <h2 id="h-teams">Your teams</h2>
+    <div class="rows" id="teams"><div class="msg">Loading scores…</div></div>
+  </section>
+
+  <footer>
+    <span id="updated"></span>
+    <button class="refresh" id="refresh" type="button">Refresh</button>
+  </footer>
+</main>
+
+<script>
+/* =====================================================================
+   CONFIG — edit these to change what the page shows.
+   ===================================================================== */
+const CONFIG = {
+  weather: { lat: 40.69146, lon: -73.92146, label: "Bushwick" },
+
+  // Station is matched by name words first; coordinates are the fallback
+  // and the center for "nearby" stations.
+  home: { label: "Leaving home", words: ["bushwick", "linden"], lat: 40.69146, lon: -73.92146, nearby: 2 },
+  work: { label: "Parking at work", words: ["bedford", "greene"], lat: 40.6869, lon: -73.9539, nearby: 3 },
+
+  // MTA Bus Time. Paste your free developer key between the quotes.
+  // Leave stopId empty and the page finds the stop by name near home.
+  bus: { key: "", route: "B52", label: "B52 to Downtown Brooklyn",
+         stopWords: ["gates", "bushwick"], lat: 40.69146, lon: -73.92146,
+         towards: /downtown|cadman|tillary|jay st/i, stopId: "" },
+
+  coins: [
+    { id: "bitcoin",   sym: "BTC"  },
+    { id: "ethereum",  sym: "ETH"  },
+    { id: "solana",    sym: "SOL"  },
+    { id: "zcash",     sym: "ZEC"  },
+    { id: "chainlink", sym: "LINK" },
+  ],
+
+  // ESPN paths: sport/league/teams/<id>
+  teams: [
+    { name: "Maple Leafs",   path: "hockey/nhl/teams/tor" },
+    { name: "Raptors",       path: "basketball/nba/teams/tor" },
+    { name: "Blue Jays",     path: "baseball/mlb/teams/tor" },
+    { name: "Friars",        path: "basketball/mens-college-basketball/teams/2507" },
+  ],
+};
+/* ===================================================================== */
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const getJSON = async url => { const r = await fetch(url, {cache:"no-store"}); if (!r.ok) throw new Error(r.status); return r.json(); };
+const tz = "America/New_York";
+
+/* ---------- Weather (Open-Meteo, no key) ---------- */
+const WMO = {0:"Clear",1:"Mostly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Freezing fog",
+  51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",56:"Freezing drizzle",57:"Freezing drizzle",
+  61:"Light rain",63:"Rain",65:"Heavy rain",66:"Freezing rain",67:"Freezing rain",
+  71:"Light snow",73:"Snow",75:"Heavy snow",77:"Snow grains",80:"Showers",81:"Showers",82:"Heavy showers",
+  85:"Snow showers",86:"Snow showers",95:"Thunderstorms",96:"Thunderstorms, hail",99:"Thunderstorms, hail"};
+
+async function loadWeather(){
+  const {lat,lon} = CONFIG.weather;
+  const u = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`+
+    `&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m`+
+    `&hourly=temperature_2m,precipitation_probability,weather_code`+
+    `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max`+
+    `&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=${encodeURIComponent(tz)}&forecast_days=2`;
+  const d = await getJSON(u);
+  const c = d.current, hi = Math.round(d.daily.temperature_2m_max[0]), lo = Math.round(d.daily.temperature_2m_min[0]);
+
+  // next 15 hours starting at the current hour
+  const nowHour = c.time.slice(0,13);
+  let start = d.hourly.time.findIndex(t => t.slice(0,13) === nowHour); if (start < 0) start = 0;
+  const hrs = d.hourly.time.slice(start, start+15).map((t,i) => ({
+    t, temp: Math.round(d.hourly.temperature_2m[start+i]), p: d.hourly.precipitation_probability[start+i] ?? 0
+  }));
+  const wet = hrs.slice(0,13).reduce((a,h) => h.p > a.p ? h : a, {p:-1});
+  const hourName = t => { const h = +t.slice(11,13); return h===0?"midnight":h===12?"noon":(h%12)+(h<12?"am":"pm"); };
+  const rainLine = wet.p >= 30 ? `Rain chance peaks at ${wet.p}% around ${hourName(wet.t)}.` : "Dry through the evening.";
+
+  $("wx").innerHTML = `
+    <div class="wx-now fresh">
+      <div class="wx-temp">${Math.round(c.temperature_2m)}°</div>
+      <div class="wx-meta">
+        <div class="wx-cond">${esc(WMO[c.weather_code] || "—")}</div>
+        <div class="wx-sub">Feels ${Math.round(c.apparent_temperature)}° · H ${hi}° L ${lo}° · Wind ${Math.round(c.wind_speed_10m)} mph</div>
+      </div>
+    </div>
+    <p class="wx-line">${rainLine}</p>
+    <div class="hours" aria-label="Next hours">
+      ${hrs.map((h,i) => `<div class="hr">
+        <div class="hr-t">${i===0?"Now":hourName(h.t)}</div>
+        <div class="hr-temp">${h.temp}°</div>
+        <div class="hr-bar"><span style="height:${Math.max(1,h.p*0.34)}px"></span></div>
+        <div class="hr-p">${h.p>=10?h.p+"%":""}</div></div>`).join("")}
+    </div>`;
+}
+
+/* ---------- Citi Bike (official GBFS feed) ---------- */
+const meters = (a,b,c,d) => { const R=6371e3, r=x=>x*Math.PI/180, dl=r(c-a), dn=r(d-b);
+  const x=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2; return 2*R*Math.asin(Math.sqrt(x)); };
+const walk = m => m < 60 ? "here" : `${Math.max(1,Math.round(m/80))} min walk`;
+const tone = n => n === 0 ? "bad" : n <= 3 ? "warn" : "good";
+
+async function loadBikes(){
+  const [info, status] = await Promise.all([
+    getJSON("https://gbfs.citibikenyc.com/gbfs/en/station_information.json"),
+    getJSON("https://gbfs.citibikenyc.com/gbfs/en/station_status.json"),
+  ]);
+  const st = new Map(status.data.stations.map(s => [s.station_id, s]));
+  const all = info.data.stations.map(s => ({...s, ...(st.get(s.station_id)||{})}));
+
+  const pick = cfg => {
+    const named = all.find(s => cfg.words.every(w => s.name.toLowerCase().includes(w)));
+    const anchor = named ? {lat:named.lat, lon:named.lon} : cfg;
+    const ranked = all.map(s => ({...s, dist: meters(anchor.lat, anchor.lon, s.lat, s.lon)}))
+                      .sort((a,b) => a.dist - b.dist);
+    return { primary: named ? ranked.find(s => s.station_id === named.station_id) : ranked[0],
+             rest: ranked.filter(s => s.station_id !== (named?.station_id ?? ranked[0].station_id)), named: !!named };
+  };
+
+  // Home: bikes
+  const h = pick(CONFIG.home), hp = h.primary;
+  const e = hp.num_ebikes_available ?? 0, classic = Math.max(0,(hp.num_bikes_available ?? 0) - e);
+  const homeOn = hp.is_renting !== 0;
+  $("home").innerHTML = `
+    <div class="ride-label">${esc(CONFIG.home.label)}</div>
+    <div class="ride-station">${esc(hp.name)}</div>
+    ${homeOn ? `<div class="big">
+      <div><div class="big-n ${tone(classic)}">${classic}</div><div class="big-l">classic</div></div>
+      <div><div class="big-n ${tone(e)}">${e}</div><div class="big-l">e-bikes</div></div>
+    </div>` : `<p class="msg bad">This station isn't renting right now.</p>`}
+    <div class="near">${h.rest.slice(0, CONFIG.home.nearby).map(s => {
+      const se = s.num_ebikes_available ?? 0, sc = Math.max(0,(s.num_bikes_available ?? 0)-se);
+      return `<div class="near-row"><span class="near-name"><span>${esc(s.name)}</span><small>${walk(s.dist)}</small></span>
+        <span class="near-val"><span class="${tone(sc)}">${sc}</span> <span class="off">/</span> <span class="${tone(se)}">${se}⚡</span></span></div>`;
+    }).join("")}</div>`;
+
+  // Work: docks
+  const w = pick(CONFIG.work);
+  const list = [w.primary, ...w.rest.slice(0, CONFIG.work.nearby - 1)];
+  const top = list[0], topDocks = top.is_returning === 0 ? 0 : (top.num_docks_available ?? 0);
+  $("work").innerHTML = `
+    <div class="ride-label">${esc(CONFIG.work.label)}</div>
+    <div class="ride-station">${esc(top.name)}</div>
+    <div class="big"><div><div class="big-n ${tone(topDocks)}">${topDocks}</div><div class="big-l">open docks</div></div></div>
+    <div class="near">${list.slice(1).map(s => {
+      const dk = s.is_returning === 0 ? 0 : (s.num_docks_available ?? 0);
+      return `<div class="near-row"><span class="near-name"><span>${esc(s.name)}</span><small>${walk(meters(top.lat,top.lon,s.lat,s.lon))}</small></span>
+        <span class="near-val ${tone(dk)}">${dk} docks</span></div>`;
+    }).join("")}</div>`;
+}
+
+/* ---------- MTA bus (Bus Time API, free key) ---------- */
+async function findBusStop(){
+  const b = CONFIG.bus;
+  if (b.stopId) return b.stopId;
+  try { const c = localStorage.getItem("busStop:"+b.route); if (c) return c; } catch(e){}
+  const u = `https://bustime.mta.info/api/where/stops-for-location.json?lat=${b.lat}&lon=${b.lon}&latSpan=0.012&lonSpan=0.012&key=${encodeURIComponent(b.key)}`;
+  const d = await getJSON(u);
+  const stops = d.data?.stops || d.data?.list || [];
+  const servesRoute = s => (s.routes || []).some(r => (r.shortName || r.id || "").toUpperCase().endsWith(b.route))
+                        || (s.routeIds || []).some(r => r.toUpperCase().endsWith(b.route));
+  const named = s => b.stopWords.every(w => (s.name || "").toLowerCase().includes(w));
+  const cands = stops.filter(s => servesRoute(s) && named(s));
+  if (!cands.length) throw new Error("stop not found");
+  // Gates & Bushwick has a stop each direction; keep the one whose buses head downtown
+  for (const s of cands){
+    const id = String(s.code || s.id).replace(/^MTA_/, "");
+    const visits = await busVisits(id).catch(() => []);
+    if (!visits.length || visits.some(v => b.towards.test(v.MonitoredVehicleJourney?.DestinationName || ""))){
+      try { localStorage.setItem("busStop:"+b.route, id); } catch(e){}
+      return id;
+    }
+  }
+  return String(cands[0].code || cands[0].id).replace(/^MTA_/, "");
+}
+async function busVisits(stopId){
+  const b = CONFIG.bus;
+  const u = `https://bustime.mta.info/api/siri/stop-monitoring.json?key=${encodeURIComponent(b.key)}&version=2`+
+    `&OperatorRef=MTA&MonitoringRef=${stopId}&LineRef=${encodeURIComponent("MTA NYCT_"+b.route)}&MaximumStopVisits=4`;
+  const d = await getJSON(u);
+  return d.Siri?.ServiceDelivery?.StopMonitoringDelivery?.[0]?.MonitoredStopVisit || [];
+}
+async function loadBus(){
+  const b = CONFIG.bus, el = $("bus");
+  if (!b.key){
+    el.innerHTML = `<div class="ride-label">${esc(b.label)}</div>
+      <p class="msg">Add your free MTA Bus Time key in the settings to see arrivals.</p>`;
+    return;
+  }
+  const stopId = await findBusStop();
+  const visits = (await busVisits(stopId)).filter(v => b.towards.test(v.MonitoredVehicleJourney?.DestinationName || ""));
+  const rows = visits.slice(0,3).map(v => {
+    const j = v.MonitoredVehicleJourney, c = j.MonitoredCall || {};
+    const t = c.ExpectedArrivalTime || c.AimedArrivalTime;
+    const mins = t ? Math.max(0, Math.round((new Date(t) - Date.now())/60000)) : null;
+    const away = c.ArrivalProximityText || c.Extensions?.Distances?.PresentableDistance || "";
+    return { mins, away };
+  });
+  el.innerHTML = `<div class="ride-label">${esc(b.label)}</div>
+    <div class="ride-station">Gates Ave &amp; Bushwick Ave</div>
+    ${rows.length ? `<div class="bus-times">${rows.map((r,i) => `<div>
+        <div class="${i===0?"big-n":"near-val"}" style="${i===0?"":"font-size:36px;line-height:.8"}">${r.mins ?? "–"}<span class="bus-min"> min</span></div>
+        <div class="bus-sub">${esc(r.away)}</div></div>`).join("")}</div>`
+      : `<p class="msg">No buses tracked toward downtown right now.</p>`}`;
+}
+
+/* ---------- Crypto (CoinGecko, no key) ---------- */
+const usd = n => n >= 1000 ? "$" + n.toLocaleString("en-US",{maximumFractionDigits:0})
+               : n >= 1 ? "$" + n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})
+               : "$" + n.toPrecision(3);
+
+async function loadCoins(){
+  const ids = CONFIG.coins.map(c => c.id).join(",");
+  const d = await getJSON(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+  $("coins").innerHTML = CONFIG.coins.map(c => {
+    const x = d[c.id]; if (!x) return "";
+    const ch = x.usd_24h_change ?? 0, cls = ch >= 0 ? "up" : "down";
+    return `<div class="row fresh"><div class="row-k">${c.sym}</div>
+      <div class="row-v">${usd(x.usd)}</div>
+      <div class="row-d ${cls}">${ch>=0?"+":""}${ch.toFixed(1)}%</div></div>`;
+  }).join("");
+}
+
+/* ---------- Teams (ESPN public site API) ---------- */
+const fmtDay = iso => {
+  const d = new Date(iso), now = new Date();
+  const dayKey = x => x.toLocaleDateString("en-US",{timeZone:tz});
+  const y = new Date(now); y.setDate(now.getDate()-1);
+  const t = new Date(now); t.setDate(now.getDate()+1);
+  if (dayKey(d) === dayKey(now)) return "Today";
+  if (dayKey(d) === dayKey(y)) return "Last night";
+  if (dayKey(d) === dayKey(t)) return "Tomorrow";
+  return d.toLocaleDateString("en-US",{timeZone:tz,weekday:"short",month:"short",day:"numeric"});
+};
+const fmtTime = iso => new Date(iso).toLocaleTimeString("en-US",{timeZone:tz,hour:"numeric",minute:"2-digit"});
+const scoreOf = c => typeof c.score === "object" ? (c.score?.displayValue ?? c.score?.value) : c.score;
+
+async function loadTeam(t){
+  const base = `https://site.api.espn.com/apis/site/v2/sports/${t.path}/schedule`;
+  const res = await Promise.allSettled([1,2,3].map(n => getJSON(`${base}?seasontype=${n}`)).concat(getJSON(base)));
+  const ok = res.filter(r => r.status === "fulfilled").map(r => r.value);
+  if (!ok.length) throw new Error("no data");
+  const myId = ok[0].team?.id;
+  const seen = new Map();
+  ok.forEach(d => (d.events || []).forEach(e => seen.set(e.id, e)));
+  const events = [...seen.values()].sort((a,b) => new Date(a.date) - new Date(b.date));
+
+  const state = e => e.competitions?.[0]?.status?.type?.state;
+  const live = events.find(e => state(e) === "in");
+  const last = [...events].reverse().find(e => state(e) === "post");
+  const next = events.find(e => state(e) === "pre" && new Date(e.date) > Date.now() - 3*3600e3);
+
+  const sides = e => {
+    const cs = e.competitions[0].competitors;
+    const me = cs.find(c => c.team?.id === myId) || cs[0];
+    const op = cs.find(c => c !== me);
+    return { me, op, vs: me.homeAway === "home" ? "vs" : "@", opp: op?.team?.abbreviation || op?.team?.shortDisplayName || "" };
+  };
+
+  let lastHTML = `<span>No recent games</span>`, nextHTML = `<span></span>`;
+  if (live){
+    const s = sides(live);
+    lastHTML = `<span><span class="live">Live</span> <b>${esc(scoreOf(s.me))}–${esc(scoreOf(s.op))}</b> ${s.vs} ${esc(s.opp)}</span>`;
+  } else if (last){
+    const s = sides(last), won = s.me.winner === true;
+    lastHTML = `<span><span class="res ${won?"up":"down"}">${won?"W":"L"}</span><b>${esc(scoreOf(s.me))}–${esc(scoreOf(s.op))}</b> ${s.vs} ${esc(s.opp)} · ${fmtDay(last.date)}</span>`;
+  }
+  if (next){
+    const s = sides(next);
+    nextHTML = `<span>Next: ${s.vs} ${esc(s.opp)}, ${fmtDay(next.date)} ${fmtTime(next.date)}</span>`;
+  } else if (!live) {
+    nextHTML = `<span>Nothing scheduled</span>`;
+  }
+  return `<div class="row team fresh"><div class="row-k">${esc(t.name)}</div>
+    <div class="game">${lastHTML}${nextHTML}</div></div>`;
+}
+
+async function loadTeams(){
+  const out = await Promise.allSettled(CONFIG.teams.map(loadTeam));
+  $("teams").innerHTML = out.map((r,i) => r.status === "fulfilled" ? r.value :
+    `<div class="row team"><div class="row-k">${esc(CONFIG.teams[i].name)}</div><div class="game"><span>Scores didn't load. Tap Refresh.</span></div></div>`).join("");
+}
+
+/* ---------- Run ---------- */
+const fail = (id, what) => () => { $(id).innerHTML = `<div class="msg">${what} didn't load. Tap Refresh to try again.</div>`; };
+
+let busy = false;
+async function loadAll(){
+  if (busy) return; busy = true; $("refresh").disabled = true;
+  $("date").textContent = new Date().toLocaleDateString("en-US",{timeZone:tz,weekday:"long",month:"long",day:"numeric"});
+  await Promise.allSettled([
+    loadWeather().catch(fail("wx","Weather")),
+    loadBikes().catch(() => { fail("home","Citi Bike")(); $("work").innerHTML = ""; }),
+    loadBus().catch(() => { $("bus").innerHTML = `<div class="ride-label">${esc(CONFIG.bus.label)}</div><p class="msg">Bus times didn't load. <a href="https://bustime.mta.info/m/?q=${encodeURIComponent(CONFIG.bus.route)}">Open Bus Time</a></p>`; }),
+    loadCoins().catch(fail("coins","Prices")),
+    loadTeams(),
+  ]);
+  $("updated").textContent = "Updated " + new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+  busy = false; $("refresh").disabled = false;
+}
+
+$("refresh").addEventListener("click", loadAll);
+let lastLoad = Date.now();
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && Date.now() - lastLoad > 60e3){ lastLoad = Date.now(); loadAll(); }
+});
+loadAll();
+</script>
+</body>
+</html>
