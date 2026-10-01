@@ -57,6 +57,26 @@ main{max-width:560px;margin:0 auto;padding:18px 16px 48px}
 .meta{color:var(--soft);font-size:15px}
 .line{margin-top:10px;font-size:16px;font-weight:600}
 
+.hero-row{display:flex;gap:14px;align-items:flex-start}
+.hero-row.has-agenda .temp{font-size:clamp(84px,24vw,150px)}
+.agenda{flex:1;min-width:0;max-width:240px;margin-left:auto;padding:12px 12px 10px;border-radius:20px;margin-top:4px;text-shadow:none}
+.cal-h{display:flex;justify-content:space-between;align-items:baseline;font:700 13px/1 var(--body);margin:0 2px 8px}
+.cal-h span{font-size:11px;color:var(--soft);font-weight:600}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px;text-align:center}
+.cal b{font:700 10px/1.6 var(--body);color:var(--faint)}
+.cal-d{position:relative;font:600 12px/24px var(--body);height:27px;color:var(--soft)}
+.cal-d.past{color:var(--faint)}
+.cal-d.today span{display:inline-block;width:23px;height:23px;line-height:23px;border-radius:50%;background:#fff;color:#0E1B2C;font-weight:800}
+.cal-d.hol span{color:var(--warn);font-weight:800}
+.cal-dots{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:2px}
+.cal-dots i{width:4px;height:4px;border-radius:50%}
+.cal-up{margin-top:8px;border-top:1px solid var(--line);padding-top:6px}
+.up-row{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:12px;line-height:1.25;min-width:0}
+.up-d{font:600 13px/1 var(--num);color:var(--soft);min-width:38px;flex:none}
+.up-row .logo-sm{width:16px;height:16px;padding:1px}
+.up-row .hdot{width:16px;height:16px;border-radius:50%;background:rgba(255,211,110,.25);color:var(--warn);font:800 10px/16px var(--body);text-align:center;flex:none}
+.up-row span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+
 /* Glass panels */
 .glass{background:var(--glass);border:1px solid var(--glass-edge);border-radius:24px;
   -webkit-backdrop-filter:blur(20px) saturate(150%);backdrop-filter:blur(20px) saturate(150%);
@@ -172,8 +192,12 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--faint)}
 
   <section class="thought" id="thought" hidden></section>
 
-  <section class="hero" id="wx" aria-live="polite">
-    <p class="temp skel">--°</p>
+  <section class="hero">
+    <div class="hero-row" id="heroRow">
+      <div id="wxTemp"><p class="temp skel">--°</p></div>
+      <aside class="glass agenda" id="agenda" hidden></aside>
+    </div>
+    <div id="wx" aria-live="polite"></div>
   </section>
   <div class="glass hours" id="hours" aria-label="Next hours"></div>
 
@@ -195,7 +219,7 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--faint)}
     <div class="glass fact" id="fact"></div>
   </div>
 
-  <footer>Quotes Wikiquote · History Wikipedia · Weather Open-Meteo · Bikes Citi Bike · Bus MTA · Prices CoinGecko · Scores ESPN</footer>
+  <footer>Quotes Wikiquote · History Wikipedia · Holidays Nager.Date · Weather Open-Meteo · Bikes Citi Bike · Bus MTA · Prices CoinGecko · Scores ESPN</footer>
 </main>
 
 <script>
@@ -229,16 +253,17 @@ const CONFIG = {
     { name: "Deepak Chopra", page: "Deepak_Chopra" },
   ],
 
+
   coins: ["bitcoin", "ethereum", "solana", "zcash", "chainlink"],
 
   teams: [
-    { name: "Maple Leafs", league: "NHL",  path: "hockey/nhl/teams/tor",
+    { name: "Maple Leafs", short: "Leafs", color: "#4D7CFE", league: "NHL",  path: "hockey/nhl/teams/tor",
       logo: "https://a.espncdn.com/i/teamlogos/nhl/500/tor.png" },
-    { name: "Raptors",     league: "NBA",  path: "basketball/nba/teams/tor",
+    { name: "Raptors", short: "Raptors", color: "#FF5A5F",     league: "NBA",  path: "basketball/nba/teams/tor",
       logo: "https://a.espncdn.com/i/teamlogos/nba/500/tor.png" },
-    { name: "Blue Jays",   league: "MLB",  path: "baseball/mlb/teams/tor",
+    { name: "Blue Jays", short: "Jays", color: "#7FD1FF",   league: "MLB",  path: "baseball/mlb/teams/tor",
       logo: "https://a.espncdn.com/i/teamlogos/mlb/500/tor.png" },
-    { name: "Friars",      league: "NCAAM", path: "basketball/mens-college-basketball/teams/2507",
+    { name: "Friars", short: "Friars", color: "#F2F2F2",      league: "NCAAM", path: "basketball/mens-college-basketball/teams/2507",
       logo: "https://a.espncdn.com/i/teamlogos/ncaa/500/2507.png" },
   ],
 };
@@ -353,8 +378,8 @@ async function loadWeather(){
   const wet = hrs.slice(0,13).reduce((a,h) => h.p > a.p ? h : a, {p:-1});
   const line = wet.p >= 30 ? `Rain chance peaks at ${wet.p}% around ${hourName(wet.t)}.` : "Dry through the evening.";
 
-  $("wx").innerHTML = `<p class="temp">${Math.round(c.temperature_2m)}°</p>
-    <div class="cond">${esc(WMO[c.weather_code] || "—")}</div>
+  $("wxTemp").innerHTML = `<p class="temp">${Math.round(c.temperature_2m)}°</p>`;
+  $("wx").innerHTML = `<div class="cond">${esc(WMO[c.weather_code] || "—")}</div>
     <div class="meta">Feels ${Math.round(c.apparent_temperature)}° · H ${Math.round(d.daily.temperature_2m_max[0])}° L ${Math.round(d.daily.temperature_2m_min[0])}° · Wind ${Math.round(c.wind_speed_10m)} mph</div>
     <div class="line">${line}</div>`;
   $("hours").innerHTML = hrs.map((h,i) => `<div class="hr"><div class="hr-t">${i===0?"Now":hourName(h.t)}</div>
@@ -515,10 +540,11 @@ async function loadTeam(t){
   let nextHTML = live ? "" : `<div class="next">Nothing scheduled</div>`;
   if (next){ const s = sides(next);
     nextHTML = `<div class="next">${s.ologo ? `<img class="logo-sm" src="${esc(s.ologo)}" alt="">` : ""}<span>${s.vs} ${esc(s.opp)} · ${fmtDay(next.date)} ${fmtTime(next.date)}</span></div>`; }
-  return { logo: ok[0].team?.logo || logoOf(ok[0].team) || t.logo, html: `<div>${resHTML}</div>${nextHTML}` };
+  const games = ev.map(e => { const s = sides(e); return { date: e.date, vs: s.vs, opp: s.opp, ologo: s.ologo }; });
+  return { logo: ok[0].team?.logo || logoOf(ok[0].team) || t.logo, html: `<div>${resHTML}</div>${nextHTML}`, games };
 }
-async function loadTeams(){
-  const out = await Promise.allSettled(CONFIG.teams.map(loadTeam));
+async function loadTeams(teamsP){
+  const out = await teamsP;
   $("teams").innerHTML = out.map((r,i) => { const t = CONFIG.teams[i], v = r.status === "fulfilled" ? r.value : null;
     return `<div class="glass team"><div class="t-head"><img class="logo" src="${esc(v?.logo || t.logo)}" alt="">
       <div><div class="t-team">${esc(t.name)}</div><div class="t-league">${esc(t.league)}</div></div></div>
@@ -581,18 +607,84 @@ async function loadFact(){
   $("factWrap").hidden = false;
 }
 
+/* ---------- Month calendar: holidays, observances, your teams' games ---------- */
+const nthDow = (y, m, dow, n) => { const d = new Date(Date.UTC(y, m, 1)); const off = (dow - d.getUTCDay() + 7) % 7; return 1 + off + (n-1)*7; };
+function observances(y, m){
+  const list = [
+    [1, 14, "Valentine's Day"], [2, 17, "St. Patrick's Day"], [9, 31, "Halloween"],
+    [11, 24, "Christmas Eve"], [11, 31, "New Year's Eve"],
+    [2, nthDow(y,2,0,2), "Clocks spring forward"], [10, nthDow(y,10,0,1), "Clocks fall back"],
+    [4, nthDow(y,4,0,2), "Mother's Day"], [5, nthDow(y,5,0,3), "Father's Day"],
+  ];
+  return list.filter(o => o[0] === m).map(o => ({ day: o[1], name: o[2] }));
+}
+async function holidays(y){
+  const key = "holidays:" + y; let h = cacheGet(key);
+  if (!h){
+    const d = await getJSON(`https://date.nager.at/api/v3/PublicHolidays/${y}/US`);
+    h = d.filter(x => x.global || (x.counties || []).includes("US-NY")).map(x => ({ date: x.date, name: x.name }));
+    cacheSet(key, h);
+  }
+  return h;
+}
+async function loadMonth(teamsP){
+  const [y, mo, dd] = todayKey().split("-").map(Number), m = mo - 1;
+  const hol = await holidays(y).catch(() => []);
+  const marks = {};   // day -> { hol: [names], games: [{team, color, ...}] }
+  const at = d => marks[d] || (marks[d] = { hol: [], games: [] });
+  hol.filter(h => +h.date.slice(5,7) === mo).forEach(h => at(+h.date.slice(8,10)).hol.push(h.name));
+  observances(y, m).forEach(o => at(o.day).hol.push(o.name));
+
+  const upcoming = [];
+  const teams = await teamsP;
+  teams.forEach((r, i) => { if (r.status !== "fulfilled") return; const t = CONFIG.teams[i];
+    r.value.games.forEach(g => {
+      const k = new Date(g.date).toLocaleDateString("en-CA",{timeZone:tz});
+      const gy = +k.slice(0,4), gm = +k.slice(5,7), gd = +k.slice(8,10);
+      if (gy === y && gm === mo) at(gd).games.push({ color: t.color });
+      if (k >= todayKey()) upcoming.push({ key: k, at: g.date, logo: g.ologo, text: `${t.short || t.name} ${g.vs} ${g.opp}` });
+    }); });
+  hol.forEach(h => { if (h.date >= todayKey()) upcoming.push({ key: h.date, hol: true, text: h.name }); });
+  for (const mm of [m, (m+1) % 12]) observances(mm < m ? y+1 : y, mm).forEach(o => {
+    const k = `${mm < m ? y+1 : y}-${String(mm+1).padStart(2,"0")}-${String(o.day).padStart(2,"0")}`;
+    if (k >= todayKey()) upcoming.push({ key: k, hol: true, text: o.name }); });
+  upcoming.sort((a,b) => a.key.localeCompare(b.key) || (a.hol ? -1 : 1));
+
+  const first = new Date(Date.UTC(y, m, 1)).getUTCDay(), days = new Date(Date.UTC(y, m+1, 0)).getUTCDate();
+  const monthName = new Date(Date.UTC(y, m, 15)).toLocaleDateString("en-US",{month:"long",timeZone:"UTC"});
+  let cells = ["S","M","T","W","T","F","S"].map(d => `<b>${d}</b>`).join("");
+  for (let i = 0; i < first; i++) cells += `<div></div>`;
+  for (let d = 1; d <= days; d++){
+    const mk = marks[d], cls = ["cal-d", d < dd ? "past" : "", d === dd ? "today" : "", mk?.hol.length ? "hol" : ""].join(" ");
+    const dots = mk?.games.length ? `<div class="cal-dots">${mk.games.slice(0,3).map(g => `<i style="background:${g.color}"></i>`).join("")}</div>` : "";
+    const title = mk ? [...mk.hol, ...(mk.games.length ? [`${mk.games.length} game${mk.games.length>1?"s":""}`] : [])].join(", ") : "";
+    cells += `<div class="${cls}"${title ? ` title="${esc(title)}"` : ""}><span>${d}</span>${dots}</div>`;
+  }
+  const short = k => new Date(k + "T12:00:00Z").toLocaleDateString("en-US",{month:"short",day:"numeric",timeZone:"UTC"});
+  // Next two items, plus the next holiday if it isn't already among them
+  let pickUp = upcoming.slice(0, 2); const nh = upcoming.find(u => u.hol);
+  if (nh && !pickUp.includes(nh)) pickUp.push(nh); else pickUp = upcoming.slice(0, 3);
+  pickUp.sort((a,b) => a.key.localeCompare(b.key));
+  const up = pickUp.map(u => `<div class="up-row"><span class="up-d">${short(u.key)}</span>${
+      u.hol ? `<span class="hdot">★</span>` : u.logo ? `<img class="logo-sm" src="${esc(u.logo)}" alt="">` : ""}<span>${esc(u.text)}</span></div>`).join("");
+  $("agenda").innerHTML = `<div class="cal-h">${esc(monthName)}<span>${y}</span></div><div class="cal">${cells}</div>${up ? `<div class="cal-up">${up}</div>` : ""}`;
+  $("agenda").hidden = false; $("heroRow").classList.add("has-agenda");
+}
+
 /* ---------- Run ---------- */
 const fail = (id, html) => () => { $(id).innerHTML = html; };
 let busy = false, lastLoad = 0;
 async function loadAll(){
   if (busy) return; busy = true; lastLoad = Date.now(); $("refresh").classList.add("spin");
   $("date").textContent = new Date().toLocaleDateString("en-US",{timeZone:tz,weekday:"long",month:"long",day:"numeric"});
+  const teamsP = Promise.allSettled(CONFIG.teams.map(loadTeam));
   await Promise.allSettled([
     loadWeather().catch(fail("wx", `<p class="msg">Weather didn't load. Tap refresh.</p>`)),
     loadBikes().catch(() => { $("home").innerHTML = `<p class="msg">Citi Bike didn't load. Tap refresh.</p>`; $("work").innerHTML = ""; }),
     loadBus().catch(e => { $("bus").innerHTML = `<div class="t-label">${ICON.bus}${esc(CONFIG.bus.label)}</div><p class="msg">Didn't load (${esc(e && e.message || "error")}). <a href="https://bustime.mta.info/m/?q=${CONFIG.bus.route}">Bus Time</a></p>`; }),
     loadCoins().catch(fail("coins", `<p class="msg">Prices didn't load. Tap refresh.</p>`)),
-    loadTeams(),
+    loadTeams(teamsP),
+    loadMonth(teamsP).catch(() => {}),
     loadThought().catch(() => {}),
     loadFact().catch(() => {}),
   ]);
