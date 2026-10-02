@@ -245,6 +245,12 @@ h2{font:700 13px/1 var(--body);letter-spacing:.06em;color:var(--soft);margin:32p
 .fc-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:16px}
 .fc-x{margin-top:12px;display:block;width:100%;padding:12px;border:1px solid var(--glass-edge);border-radius:14px;background:transparent;color:var(--ink);font:600 14px/1 var(--body);cursor:pointer}
 
+/* Today's law */
+.law-k{font:700 11px/1 var(--body);letter-spacing:.08em;color:var(--soft);margin-bottom:8px}
+.law-gist{margin:8px 0 0;font-size:15.5px;line-height:1.5;color:var(--soft)}
+.ex-btn{display:block;margin-top:8px;padding:4px 0;border:0;background:transparent;color:var(--soft);font:600 13px/1.2 var(--body);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.ex{margin:6px 0 0;font-size:15px;line-height:1.5;color:var(--soft)}
+
 /* Morning thought */
 .thought{margin:22px 2px 6px}
 .q{font:400 clamp(26px,7vw,32px)/1.22 "Instrument Serif",Georgia,serif;margin:0;letter-spacing:-.005em;text-wrap:pretty}
@@ -338,7 +344,7 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--faint)}
   <h2>ITALIANO</h2>
   <div class="glass ita" id="ita"></div>
 
-  <footer>Quotes Wikiquote · Good news: Good News Network, Positive News · Major events: Wikipedia · Holidays Nager.Date · Weather &amp; air Open-Meteo · Bikes Citi Bike · Bus &amp; subway MTA · Prices CoinGecko · Scores ESPN<br><button class="fc-btn" id="fcBtn" type="button">Font check</button></footer>
+  <footer>Good news: Good News Network, Positive News · Major events: Wikipedia · Holidays Nager.Date · Weather &amp; air Open-Meteo · Bikes Citi Bike · Bus &amp; subway MTA · Prices CoinGecko · Scores ESPN<br><button class="fc-btn" id="fcBtn" type="button">Font check</button></footer>
 </main>
 
 <script>
@@ -377,15 +383,6 @@ const CONFIG = {
 
   // Unlock link: the Citi Bike system's own scan-to-unlock link (from its live feed).
   unlockUrl: "https://bkn.lft.to/lastmile_qr_scan",
-
-  // Daily thought: one author per day, quote pulled from their Wikiquote page.
-  quoteAuthors: [
-    { name: "Alan Watts",      page: "Alan_Watts" },
-    { name: "Tao Te Ching",    page: "Tao_Te_Ching" },
-    { name: "Ram Dass",        page: "Ram_Dass" },
-    { name: "Marcus Aurelius", page: "Marcus_Aurelius" },
-    { name: "Deepak Chopra",   page: "Deepak_Chopra" },
-  ],
 
   // Subway: GTFS stop J30 = Gates Av. "S" = Manhattan-bound there, "N" = outbound.
   train: { stop: "J30", feed: "jz", name: "Gates Av", towardDir: "S", toward: "Manhattan", otherDir: "N", other: "Outbound" },
@@ -820,61 +817,98 @@ const pickIdx = (n, salt) => (Math.imul(dayNum()+salt, 2654435761) >>> 0) % n;
 const cacheGet = k => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch(e){ return null; } };
 const cacheSet = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
 
-const PROMPTS = [
-  "What would make today feel well spent?", "Where can you slow down by ten percent today?",
-  "What are you holding onto that you could set down?", "Who could use a kind word from you today?",
-  "What's one thing you're looking forward to?", "What would you do today if you trusted yourself completely?",
-  "What can you let be exactly as it is?", "Take three slow breaths before you pick up your phone again.",
-  "What's the smallest step that moves the important thing forward?", "What are you grateful for that you usually overlook?",
-  "Where are you rushing that you don't need to?", "What would a calmer version of you do first?",
-  "What's worth your full attention today?", "What story are you telling yourself that might not be true?",
-  "How do you want to feel at the end of today?", "What can you do today that your future self will thank you for?",
-  "Where could you choose curiosity over judgment?", "What's one thing you can do just for the joy of it?",
-  "Who taught you something you still use? Thank them, even silently.", "What are you avoiding, and what would it take to start?",
-  "Pick one ordinary moment today to fully notice.", "What does enough look like today?",
-  "What would you try if it didn't have to be perfect?", "Where can you listen more than you speak today?",
-  "What's within your control this morning, and what isn't?", "What small kindness can you do without anyone knowing?",
-  "What made you laugh recently? Bring that with you.", "What can you simplify today?",
-  "What would it mean to be fully here for the next hour?", "What's one thing you can forgive, including in yourself?",
-  "Breathe in for four, out for six, three times. What changed?",
+/* ---------- Today's law (one per weekday; summaries, prompts, and examples are original) ---------- */
+const LAWS = [
+  { day: "Sunday", name: "Pure Potentiality",
+    gist: "Beneath the noise of the day is a quiet, steady part of you. Starting from stillness instead of reaction opens up more options.",
+    prompts: [
+      ["Before you check anything else, sit for one minute and do nothing. What do you notice?",
+       "Phone face-down, coffee in hand, sixty seconds of just sitting. Maybe you notice your shoulders are already tense, or that the apartment is unusually quiet. Noticing is the whole exercise."],
+      ["Where could you hold off on judging something today and just watch it?",
+       "A coworker shows up late. Instead of deciding they're careless, you just note \"they're late\" and leave it there. Maybe there was a reason, maybe not. Either way, you skip the irritation."],
+      ["Step outside for a moment. What's the first thing you notice?",
+       "On the way to the bike dock, stop for ten seconds. The air is colder than yesterday, a bird is going at it somewhere, the street is empty. A small reset before the day starts."],
+      ["What would today look like if you started from calm instead of catching up?",
+       "Instead of opening messages the second you wake up, you get dressed, eat, and head out on time first. The messages haven't changed, but you meet them steady instead of scrambling."]] },
+  { day: "Monday", name: "Giving",
+    gist: "Attention, kindness, and generosity tend to come back around. Giving freely and receiving gracefully keeps that flow open.",
+    prompts: [
+      ["What's one small thing you can offer someone today without expecting anything back?",
+       "Holding a door, telling the person who made your coffee it's great, texting a friend that you're thinking of them. Small and free, with nothing expected back."],
+      ["When someone does something kind for you today, can you simply receive it?",
+       "Someone compliments your work. Instead of \"oh, it was nothing,\" you just say \"thanks, that means a lot.\" Letting it land is part of the exchange."],
+      ["Who could use a word of encouragement from you this week?",
+       "A coworker who's been stretched thin, or a friend starting something new. One line, like \"you're handling this really well,\" can carry someone through a rough week."],
+      ["What's something you've been given recently that you're grateful for?",
+       "A friend covering for you, a good conversation, a quiet morning. Naming one specific thing tends to shift your mood more than general gratitude does."]] },
+  { day: "Tuesday", name: "Karma",
+    gist: "Every choice sets something in motion. Noticing what you're choosing, and where it leads, turns habits into decisions.",
+    prompts: [
+      ["Pick one choice you'll make today and pause before it: where does it lead?",
+       "You're about to fire back at a curt message. Pause: that probably leads to a longer, worse thread. A calmer reply leads somewhere better for both of you."],
+      ["Which of your habits is quietly shaping your days the most?",
+       "Scrolling in bed before sleep, or skipping breakfast on shift days. Neither feels like a choice, but each one shapes how the next morning goes."],
+      ["When a decision feels right in your body, what does that feel like? Notice it today.",
+       "Saying yes to something you actually want often feels open and light. Saying yes out of obligation feels tight. Today, just notice which one shows up."],
+      ["What did you do yesterday that today-you will benefit from?",
+       "Laying out your clothes, getting to bed on time, prepping lunch. Small things past-you did that make this morning easier, and worth repeating."]] },
+  { day: "Wednesday", name: "Least Effort",
+    gist: "Things often go easier when you stop pushing against what's already true. Accept the moment, own your part, and drop the need to win every point.",
+    prompts: [
+      ["What's one thing today you can accept as it is instead of fighting it?",
+       "The bus is late, or it's raining on a bike day. You can't change it. Accepting it in the first ten seconds saves twenty minutes of being annoyed."],
+      ["Where are you forcing something that might go better if you eased off?",
+       "Rewriting the same message five times, or trying to fix a problem by pushing harder. Sometimes stepping back, asking for help, or waiting a day gets you there faster."],
+      ["Is there a point you don't need to win today?",
+       "Someone has a small fact wrong, or a debate at work doesn't really matter. Letting it go costs nothing and saves your energy for what does."],
+      ["What would your shift feel like with half the tension?",
+       "Same tasks, same pace, but relaxed shoulders, slower breathing, and no bracing for things to go wrong. The work gets done either way. One version is easier on you."]] },
+  { day: "Thursday", name: "Intention and Desire",
+    gist: "Clear intentions shape attention, and attention shapes what happens. Set the intention, then put your focus back on what's in front of you.",
+    prompts: [
+      ["What's one thing you genuinely want this month? Say it plainly to yourself.",
+       "Not \"be healthier\" but \"cook dinner at home four nights a week.\" Saying it plainly makes it concrete enough to act on."],
+      ["Set one intention for today, then let it go and get on with your day.",
+       "\"Today I want to be patient with people.\" Say it once in the morning, then go about your day. You'll catch the moments where it matters without forcing it."],
+      ["What gets most of your attention lately? Is that what you want to grow?",
+       "If most of your spare attention goes to the news or your phone, worry and distraction grow. If it goes to a craft, a person, or a goal, that grows instead."],
+      ["What would a good day look like, specifically?",
+       "Not just \"a good day,\" but: left on time, got through the shift without rushing, ate a real lunch, called someone you like. A specific picture is easier to steer toward."]] },
+  { day: "Friday", name: "Detachment",
+    gist: "Care about outcomes without gripping them. Uncertainty isn't a problem to solve; it's where new options come from.",
+    prompts: [
+      ["What outcome are you holding onto too tightly right now?",
+       "Wanting a project to go exactly as planned, a person to respond a certain way, or a number to hit by a date. Gripping it adds stress without improving the odds."],
+      ["Where could you leave room for a better result than the one you planned?",
+       "You planned a certain route, recipe, or way a conversation would go. Staying open means noticing when something better shows up, instead of forcing the original plan."],
+      ["What's uncertain in your life that you could get curious about instead of anxious?",
+       "An unknown at work, or a decision you haven't made yet. Instead of \"what if it goes wrong,\" try \"I wonder what this could turn into.\" Same facts, different feeling."],
+      ["Can you give something your full effort today and let the result be what it is?",
+       "You do your best at something, then let it go. Whether people love it isn't up to you. The effort is yours; the result belongs to everything else."]] },
+  { day: "Saturday", name: "Dharma",
+    gist: "Everyone has things they do with unusual ease and care. Using those gifts for other people is where purpose tends to show up.",
+    prompts: [
+      ["What do you do that makes time disappear?",
+       "The thing where you look up and two hours have passed. That's usually a clue about where your natural gifts are."],
+      ["Who benefits when you do your best work? Picture them.",
+       "The people who eat what you make, the coworker you help, the friend who takes your advice. Picturing them turns work into something you do for someone."],
+      ["What's one talent you've been underusing lately?",
+       "A skill you used to practice and dropped, or something people often ask you about. Is there a small way to use it this week?"],
+      ["How could you be useful to someone today in a way only you could be?",
+       "Your particular mix of skills, neighborhood knowledge, and experience makes you useful in ways a stranger couldn't be. Offer one piece of it to someone today."]] },
 ];
-async function quotesFor(a){
-  const d = await getJSON(`https://en.wikiquote.org/w/api.php?action=parse&page=${a.page}&prop=text&format=json&formatversion=2&origin=*`);
-  const doc = new DOMParser().parseFromString(d.parse.text, "text/html");
-  const root = doc.querySelector(".mw-parser-output") || doc.body;
-  const skip = /disputed|misattributed|about|external|see also|sources|references|notes|attributed|quotes about/i;
-  const junk = /translat|variant|as quoted|isbn|\bp\.\s?\d|\bpp\.|chapter \d|^ch\.|^book [ivx\d]/i;
-  let section = "", quotes = [];
-  for (const el of root.children){
-    const h2 = el.matches("h2") ? el : el.querySelector(":scope > h2");
-    if (h2){ section = h2.textContent; continue; }
-    if (el.tagName !== "UL" || skip.test(section)) continue;
-    for (const li of el.querySelectorAll(":scope > li")){
-      const c = li.cloneNode(true); c.querySelectorAll("ul, sup, .reference, style").forEach(n => n.remove());
-      const t = c.textContent.replace(/\s+/g," ").trim();
-      if (t.length >= 40 && t.length <= 300 && !junk.test(t)) quotes.push(t);
-    }
-  }
-  return quotes;
-}
-async function loadThought(){
-  const key = "thought2:" + todayKey();
-  let q = cacheGet(key);
-  if (!q){
-    const A = CONFIG.quoteAuthors;
-    for (let k = 0; k < A.length && !q; k++){           // today's voice first, then the next if that page won't parse
-      const a = A[(dayNum() + k) % A.length];
-      const list = await quotesFor(a).catch(() => []);
-      if (list.length) q = { text: list[pickIdx(list.length, 3)], by: a.name, url: `https://en.m.wikiquote.org/wiki/${a.page}` };
-    }
-    if (!q) throw new Error("no quotes");
-    cacheSet(key, q);
-  }
-  const prompt = PROMPTS[dayNum() % PROMPTS.length];
+function renderLaw(){
+  const law = LAWS[nyDow()], week = Math.floor(dayNum() / 7);
+  const [prompt, example] = law.prompts[week % law.prompts.length];
   const el = $("thought");
-  el.innerHTML = `<p class="q">“${esc(q.text.replace(/^["“]|["”]$/g,""))}”</p>
-    <div class="q-by">${esc(q.by)} · <a href="${esc(q.url)}">more</a></div>
-    <div class="reflect"><b>SIT WITH THIS</b>${esc(prompt)}</div>`;
+  el.innerHTML = `<div class="law-k">TODAY'S LAW · ${esc(law.day.toUpperCase())}</div>
+    <p class="q">${esc(law.name)}</p>
+    <p class="law-gist">${esc(law.gist)}</p>
+    <div class="reflect"><b>SIT WITH THIS</b>${esc(prompt)}
+      <button class="ex-btn" id="exBtn" type="button" aria-expanded="false">Show an example</button>
+      <p class="ex" id="exText" hidden>${esc(example)}</p></div>`;
+  $("exBtn").onclick = () => { const t = $("exText"); t.hidden = !t.hidden;
+    $("exBtn").textContent = t.hidden ? "Show an example" : "Hide example"; $("exBtn").setAttribute("aria-expanded", !t.hidden); };
   el.hidden = false;
 }
 
@@ -1165,6 +1199,7 @@ function renderGreeting(){
   $("gHi").textContent = hello();
 applyFont();
 renderItalian();
+renderLaw();
 $("fcBtn").addEventListener("click", fontCheck);
 setInterval(() => { renderShift(); if (currentMode() !== document.documentElement.dataset.mode){ applyMode(); renderGreeting(); } }, 60e3);
   renderShift();
@@ -1238,7 +1273,6 @@ async function loadAll(){
     loadNews().catch(() => {}),
     loadTeams(teamsP),
     loadMonth(teamsP).catch(() => {}),
-    loadThought().catch(() => {}),
   ]);
   applyMode();
   // On days off (or once the shift has started), commute moves lower on the page
@@ -1248,6 +1282,7 @@ async function loadAll(){
   renderAlerts();
   renderGreeting();
   renderItalian();
+  renderLaw();
   $("updated").textContent = new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
   $("refresh").classList.remove("spin"); busy = false;
 }
