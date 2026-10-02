@@ -13,24 +13,38 @@
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=Instrument+Serif&family=Atkinson+Hyperlegible:wght@400;700&family=EB+Garamond:wght@400;600&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --sky1:#2F6FD6; --sky2:#89C2F0; --glow:rgba(255,214,110,.55);
   --ink:#fff; --soft:rgba(255,255,255,.72); --faint:rgba(255,255,255,.45);
   --glass:rgba(255,255,255,.13); --glass-edge:rgba(255,255,255,.24); --line:rgba(255,255,255,.16);
-  --good:#6CF0A8; --warn:#FFD36E; --bad:#FF7A7A;
+  --good:#6CF0A8; --warn:#FFD36E; --bad:#FF7A7A; --down:rgba(255,255,255,.62);
+  --pill-bg:#fff; --pill-ink:#0E1B2C; --rain:#BFE3FF; --ink2:rgba(255,255,255,.93); --tk-bg:rgba(255,255,255,.08);
+  --alert-ink:#FFE3A3; --alert-bg:rgba(255,211,110,.16); --hero-shadow:0 2px 24px rgba(0,0,0,.18);
   --num:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --body:"Manrope",-apple-system,"Segoe UI",system-ui,sans-serif;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
+/* Pre-dawn "paper" mode: dark text on a soft light background (more legible in a dark room) */
+html[data-mode=paper]{ --ink:#17222C; --soft:rgba(23,34,44,.66); --faint:rgba(23,34,44,.44); --glass:rgba(255,255,255,.74);
+  --glass-edge:rgba(23,34,44,.10); --line:rgba(23,34,44,.10); --good:#17804F; --warn:#9A6300; --bad:#B8322A; --down:rgba(23,34,44,.55);
+  --pill-bg:#17222C; --pill-ink:#fff; --rain:#2F6FB3; --ink2:rgba(23,34,44,.88); --tk-bg:rgba(23,34,44,.05);
+  --alert-ink:#5E3D00; --alert-bg:rgba(214,150,30,.16); --hero-shadow:none }
+/* Evening wind-down mode before an early shift: low light, warm, no motion */
+html[data-mode=dim]{ --ink:#E9DCC8; --soft:rgba(233,220,200,.62); --faint:rgba(233,220,200,.38); --glass:rgba(255,236,210,.05);
+  --glass-edge:rgba(255,236,210,.10); --line:rgba(255,236,210,.08); --good:#B9D79A; --warn:#E5B567; --bad:#E58C76; --down:rgba(233,220,200,.5);
+  --pill-bg:#E9DCC8; --pill-ink:#1A120B; --rain:#C9A77A; --ink2:rgba(233,220,200,.86); --tk-bg:rgba(255,236,210,.04);
+  --alert-ink:#EBCB95; --alert-bg:rgba(229,181,103,.12); --hero-shadow:none }
+html[data-mode=paper] .glass, html[data-mode=dim] .glass{box-shadow:none}
 *,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none !important}
 html,body{margin:0;min-height:100%}
-body{color:var(--ink);font:500 16px/1.45 var(--body);-webkit-font-smoothing:antialiased;background:var(--sky1)}
+body{color:var(--ink);font:500 17px/1.5 var(--body);-webkit-font-smoothing:antialiased;background:var(--sky1)}
 img{display:block}
-:focus-visible{outline:2px solid #fff;outline-offset:3px}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 
 /* Sky: gradient + sun/moon glow, then particle canvas on top */
 #sky{position:fixed;inset:0;z-index:-2;
@@ -45,14 +59,14 @@ main{max-width:560px;margin:0 auto;padding:18px 16px 48px}
 
 /* Header */
 .top{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:15px;color:var(--soft)}
-.refresh{display:flex;align-items:center;gap:6px;background:var(--glass);border:1px solid var(--glass-edge);color:#fff;
+.refresh{display:flex;align-items:center;gap:6px;background:var(--glass);border:1px solid var(--glass-edge);color:var(--ink);
   border-radius:999px;padding:7px 13px;font:600 13px/1 var(--body);cursor:pointer;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 .refresh svg{width:14px;height:14px}
 .refresh.spin svg{animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* Hero weather */
-.hero{margin:26px 0 18px;text-shadow:0 2px 24px rgba(0,0,0,.18)}
+.hero{margin:26px 0 18px;text-shadow:var(--hero-shadow)}
 .temp{font:600 clamp(120px,36vw,168px)/.78 var(--num);letter-spacing:-.03em;margin:0}
 .cond{font:700 30px/1.1 var(--body);letter-spacing:-.02em;margin:14px 0 4px}
 .meta{color:var(--soft);font-size:15px}
@@ -67,7 +81,7 @@ main{max-width:560px;margin:0 auto;padding:18px 16px 48px}
 .cal b{font:700 10px/1.6 var(--body);color:var(--faint)}
 .cal-d{position:relative;font:600 12px/24px var(--body);height:27px;color:var(--soft)}
 .cal-d.past{color:var(--faint)}
-.cal-d.today span{display:inline-block;width:23px;height:23px;line-height:23px;border-radius:50%;background:#fff;color:#0E1B2C;font-weight:800}
+.cal-d.today span{display:inline-block;width:23px;height:23px;line-height:23px;border-radius:50%;background:var(--pill-bg);color:var(--pill-ink);font-weight:800}
 .cal-d.hol span{color:var(--warn);font-weight:800}
 .cal-dots{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:2px}
 .cal-dots i{width:4px;height:4px;border-radius:50%}
@@ -77,6 +91,11 @@ main{max-width:560px;margin:0 auto;padding:18px 16px 48px}
 .up-row .logo-sm{width:16px;height:16px;padding:1px}
 .up-row .hdot{width:16px;height:16px;border-radius:50%;background:rgba(255,211,110,.25);color:var(--warn);font:800 10px/16px var(--body);text-align:center;flex:none}
 .up-row span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+
+.oura{display:flex;align-items:center;gap:10px;margin-top:10px;padding:14px 16px;border-radius:18px;color:var(--ink);text-decoration:none;font:700 15px/1 var(--body)}
+.oura svg{width:20px;height:20px;flex:none}
+.oura small{margin-left:auto;font:600 12px/1 var(--body);color:var(--soft)}
+.oura:active{transform:scale(.98)}
 
 /* Glass panels */
 .glass{background:var(--glass);border:1px solid var(--glass-edge);border-radius:24px;
@@ -88,8 +107,8 @@ main{max-width:560px;margin:0 auto;padding:18px 16px 48px}
 .hr{flex:0 0 54px;text-align:center}
 .hr-t{font-size:12px;color:var(--soft);font-weight:600}
 .hr-temp{font:600 22px/1.4 var(--num)}
-.hr-p{height:18px;font-size:11px;font-weight:700;color:#BFE3FF}
-.hr-p i{display:block;margin:2px auto 0;width:22px;height:3px;border-radius:2px;background:#BFE3FF}
+.hr-p{height:18px;font-size:11px;font-weight:700;color:var(--rain)}
+.hr-p i{display:block;margin:2px auto 0;width:22px;height:3px;border-radius:2px;background:var(--rain)}
 
 h2{font:700 13px/1 var(--body);letter-spacing:.06em;color:var(--soft);margin:32px 4px 12px}
 
@@ -113,7 +132,7 @@ h2{font:700 13px/1 var(--body);letter-spacing:.06em;color:var(--soft);margin:32p
 .near-name span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .near-name small{color:var(--faint);font-size:12px;white-space:nowrap}
 .near-val{font:700 18px/1 var(--num);white-space:nowrap}
-.good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)} .dim{color:var(--faint)}
+.good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)} .dim{color:var(--faint)} .down{color:var(--down)}
 .bus-next{display:flex;gap:16px;margin-top:10px;font:700 22px/1 var(--num);color:var(--soft)}
 .bus-sub{font-size:12px;color:var(--soft);margin-top:6px;font-weight:600}
 
@@ -129,7 +148,7 @@ h2{font:700 13px/1 var(--body);letter-spacing:.06em;color:var(--soft);margin:32p
 .c-price{font:700 21px/1 var(--num)}
 .pill{display:inline-block;margin-top:5px;padding:3px 8px;border-radius:999px;font:700 12px/1 var(--body)}
 .pill.up{background:rgba(108,240,168,.18);color:var(--good)}
-.pill.down{background:rgba(255,122,122,.18);color:var(--bad)}
+.pill.down{background:var(--tk-bg);color:var(--down)}
 
 /* Teams */
 .teams{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -142,21 +161,99 @@ h2{font:700 13px/1 var(--body);letter-spacing:.06em;color:var(--soft);margin:32p
 .res{display:flex;align-items:center;gap:8px}
 .wl{font:700 15px/1 var(--body);width:26px;height:26px;border-radius:8px;display:grid;place-items:center}
 .wl.w{background:rgba(108,240,168,.2);color:var(--good)}
-.wl.l{background:rgba(255,122,122,.2);color:var(--bad)}
+.wl.l{background:var(--tk-bg);color:var(--down)}
 .wl.live{background:var(--bad);color:#fff;width:auto;padding:0 7px;font-size:11px;letter-spacing:.05em}
 .score{font:700 26px/1 var(--num)}
 .when{font-size:12px;color:var(--soft);font-weight:600}
 .next{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--soft);font-weight:600;border-top:1px solid var(--line);padding-top:10px}
 
+/* Greeting */
+.greet{margin:22px 2px 0}
+.g-hi{font:700 27px/1.15 var(--body);letter-spacing:-.02em;margin:0}
+.g-body{margin:10px 0 0;font-size:18px;line-height:1.5;color:var(--ink2);text-wrap:pretty}
+
+/* Reflection */
+.reflect{margin-top:14px;padding:2px 0 2px 12px;border-left:2px solid var(--glass-edge);font-size:16px;line-height:1.45;color:var(--ink2)}
+.reflect b{display:block;font:700 11px/1 var(--body);letter-spacing:.08em;color:var(--soft);margin-bottom:5px}
+
+/* Weather chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;text-shadow:none}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-edge);font:600 12.5px/1 var(--body)}
+.chip i{width:7px;height:7px;border-radius:50%;display:inline-block}
+
+/* Alerts inside commute tiles */
+.alert{margin-top:10px;padding:8px 10px;border-radius:12px;background:var(--alert-bg);color:var(--alert-ink);font-size:13px;line-height:1.35}
+.alert span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.alert b{color:var(--warn)}
+.bullet{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#996633;color:#fff;font:800 11px/1 var(--body);flex:none}
+
+/* Teams that aren't playing */
+.off{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.off-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 11px 6px 6px;border-radius:999px;font:600 12.5px/1 var(--body);color:var(--soft)}
+
+/* Crypto ticker */
+.ticker{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:10px;border-radius:20px}
+.ticker::-webkit-scrollbar{display:none}
+.tk{flex:none;display:flex;align-items:center;gap:7px;padding:6px 10px 6px 6px;border-radius:999px;background:var(--tk-bg)}
+.tk img{width:22px;height:22px;border-radius:50%;background:#fff}
+.tk b{font:700 13px/1 var(--body)}
+.tk span{font:700 16px/1 var(--num)}
+.tk em{font:700 12px/1 var(--body);font-style:normal}
+.tk-btn{flex:none;border:1px solid var(--glass-edge);background:transparent;color:var(--ink);border-radius:999px;padding:0 12px;font:700 12px/1 var(--body);cursor:pointer}
+#coins{margin-top:10px}
+
+/* Headlines */
+.news{padding:4px 16px}
+.news a{display:block;padding:12px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;font:600 16px/1.35 var(--body)}
+.news a:last-child{border-bottom:0}
+.news small{display:block;margin-top:4px;font:600 11.5px/1 var(--body);color:var(--soft)}
+
+/* Shift line */
+.shift{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:7px 12px;border-radius:999px;font:700 13.5px/1 var(--body)}
+
+/* Italian */
+.ita{padding:18px}
+.ita-day{font:700 11px/1 var(--body);letter-spacing:.08em;color:var(--soft)}
+.ita-word{display:flex;align-items:center;gap:12px;margin:10px 0 4px}
+.ita-word b{font:400 clamp(30px,8vw,38px)/1.1 "Instrument Serif",Georgia,serif}
+.say{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--glass-edge);background:transparent;color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.say svg{width:18px;height:18px}
+.ita-pron{font-size:15px;color:var(--soft);letter-spacing:.02em}
+.reveal{margin-top:14px;width:100%;padding:12px;border-radius:14px;border:1px dashed var(--glass-edge);background:transparent;color:var(--ink);font:700 14px/1 var(--body);cursor:pointer}
+.ita-ans{margin-top:14px}
+.ita-en{font:700 19px/1.3 var(--body)}
+.ita-ex{margin-top:10px;font-size:16px;line-height:1.45}
+.ita-ex i{display:block;font-style:normal;color:var(--soft);font-size:15px;margin-top:2px}
+.ita-note{margin-top:10px;font-size:14px;color:var(--soft);line-height:1.45}
+.ita-prev{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:14.5px;color:var(--soft)}
+.ita-prev button{border:0;background:transparent;color:var(--ink);font:700 14.5px/1.3 var(--body);padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* Good news */
+.major{display:block;padding:12px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;font:600 16px/1.35 var(--body)}
+.major em{display:inline-block;margin-right:6px;padding:3px 7px;border-radius:6px;background:var(--alert-bg);color:var(--alert-ink);font:700 11px/1 var(--body);font-style:normal;letter-spacing:.04em;vertical-align:2px}
+.news-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;padding:13px 0;border:0;background:transparent;color:var(--ink);font:700 15px/1 var(--body);cursor:pointer}
+.news-toggle span{color:var(--soft);font-weight:600;font-size:13px}
+
+/* Font check */
+.fc-btn{margin-top:10px;border:1px solid var(--glass-edge);background:transparent;color:var(--soft);border-radius:999px;padding:8px 14px;font:600 12.5px/1 var(--body);cursor:pointer}
+.fc{position:fixed;inset:0;z-index:10;background:var(--sky1);color:var(--ink);overflow:auto;padding:calc(24px + env(safe-area-inset-top,0px)) 20px 40px}
+.fc-in{max-width:560px;margin:0 auto}
+.fc h3{font:700 22px/1.2 var(--body);margin:0 0 10px}
+.fc p{font-size:16px;line-height:1.5}
+.fc-text{font-size:19px;line-height:1.6;margin:18px 0 22px}
+.fc-go{display:block;width:100%;padding:15px;border:0;border-radius:16px;background:var(--pill-bg);color:var(--pill-ink);font:700 16px/1 var(--body);cursor:pointer}
+.fc-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:16px}
+.fc-x{margin-top:12px;display:block;width:100%;padding:12px;border:1px solid var(--glass-edge);border-radius:14px;background:transparent;color:var(--ink);font:600 14px/1 var(--body);cursor:pointer}
+
 /* Morning thought */
 .thought{margin:22px 2px 6px}
-.q{font:400 italic clamp(24px,6.6vw,30px)/1.22 "Instrument Serif",Georgia,serif;margin:0;letter-spacing:-.005em;text-wrap:pretty}
+.q{font:400 clamp(26px,7vw,32px)/1.22 "Instrument Serif",Georgia,serif;margin:0;letter-spacing:-.005em;text-wrap:pretty}
 .q-by{margin-top:10px;font-size:13px;font-weight:600;color:var(--soft)}
 .q-by a{color:var(--soft);text-underline-offset:3px}
 
 /* Unlock button */
 .unlock{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;padding:13px;border-radius:16px;
-  background:#fff;color:#0E1B2C;font:700 15px/1 var(--body);text-decoration:none}
+  background:var(--pill-bg);color:var(--pill-ink);font:700 15px/1 var(--body);text-decoration:none}
 .unlock svg{width:18px;height:18px}
 .unlock:active{transform:scale(.98)}
 
@@ -169,7 +266,7 @@ h2{font:700 13px/1 var(--body);letter-spacing:.06em;color:var(--soft);margin:32p
 .f-img{width:84px;height:84px;border-radius:16px;object-fit:cover;background:var(--glass)}
 
 .msg{color:var(--soft);font-size:14px;padding:6px 0}
-.msg a{color:#fff}
+.msg a{color:var(--ink)}
 .skel{opacity:.5}
 footer{margin-top:28px;text-align:center;font-size:12px;color:var(--faint)}
 
@@ -191,6 +288,12 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--faint)}
     </button>
   </div>
 
+  <section class="greet" aria-live="polite">
+    <p class="g-hi" id="gHi"></p>
+    <p class="g-body" id="gBody"></p>
+    <div class="glass shift" id="shift" hidden></div>
+  </section>
+
   <section class="thought" id="thought" hidden></section>
 
   <section class="hero">
@@ -202,25 +305,40 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--faint)}
   </section>
   <div class="glass hours" id="hours" aria-label="Next hours"></div>
 
+  <a class="glass oura" id="oura" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13.5" r="6.5"/><path d="M9 3.5h6"/></svg>
+    <span>Check Oura scores</span><small>Readiness · Sleep</small>
+  </a>
+
+  <section id="commuteWrap">
   <h2>COMMUTE</h2>
   <div class="commute">
     <div class="glass tile wide" id="home"><div class="msg">Checking your stop…</div></div>
     <div class="glass tile" id="bus"><div class="msg">Checking the bus…</div></div>
-    <div class="glass tile" id="work"><div class="msg">Checking docks…</div></div>
+    <div class="glass tile" id="train"><div class="msg">Checking the J…</div></div>
+    <div class="glass tile wide" id="work"><div class="msg">Checking docks…</div></div>
+  </div>
+  </section>
+
+  <div id="teamsWrap">
+    <h2>YOUR TEAMS</h2>
+    <div class="teams" id="teams"><div class="msg">Loading scores…</div></div>
+    <div class="off" id="teamsOff"></div>
   </div>
 
-  <h2>MARKETS · 7 DAYS</h2>
-  <div class="glass coins" id="coins"><div class="msg">Loading prices…</div></div>
+  <h2>MARKETS</h2>
+  <div class="glass ticker" id="ticker"><div class="msg">Loading prices…</div></div>
+  <div class="glass coins" id="coins" hidden></div>
 
-  <h2>YOUR TEAMS</h2>
-  <div class="teams" id="teams"><div class="msg">Loading scores…</div></div>
-
-  <div id="factWrap" hidden>
-    <h2>ON THIS DAY</h2>
-    <div class="glass fact" id="fact"></div>
+  <div id="newsWrap" hidden>
+    <h2>GOOD NEWS</h2>
+    <div class="glass news" id="news"></div>
   </div>
 
-  <footer>Quotes Wikiquote · History Wikipedia · Holidays Nager.Date · Weather Open-Meteo · Bikes Citi Bike · Bus MTA · Prices CoinGecko · Scores ESPN</footer>
+  <h2>ITALIANO</h2>
+  <div class="glass ita" id="ita"></div>
+
+  <footer>Quotes Wikiquote · Good news: Good News Network, Positive News · Major events: Wikipedia · Holidays Nager.Date · Weather &amp; air Open-Meteo · Bikes Citi Bike · Bus &amp; subway MTA · Prices CoinGecko · Scores ESPN<br><button class="fc-btn" id="fcBtn" type="button">Font check</button></footer>
 </main>
 
 <script>
@@ -230,6 +348,16 @@ footer{margin-top:28px;text-align:center;font-size:12px;color:var(--faint)}
    cloudy, overcast, fog, snow, storm) to the page address.
    ===================================================================== */
 const CONFIG = {
+  name: "Daniele",
+
+  // Shift start by weekday (0 = Sunday). Days not listed are days off.
+  shifts: { 0: "04:00", 1: "04:00", 2: "06:30", 3: "05:00", 4: "05:00" },
+  leaveBefore: 20,          // minutes before the shift you head out
+  windDownFrom: 18,         // evening hour when wind-down mode starts before a work day
+
+  // Good-news feeds (fetched through the relay)
+  goodNews: ["gnn", "positive"],
+
   weather: { lat: 40.69146, lon: -73.92146 },
 
   // Station matched by name words first; coordinates are the fallback.
@@ -244,15 +372,26 @@ const CONFIG = {
          stopWords: ["gates", "bushwick"], lat: 40.69146, lon: -73.92146,
          towards: /downtown|cadman|tillary|jay st/i },
 
+  // Oura button runs an iPhone Shortcut named exactly this, which opens the Oura app.
+  ouraShortcut: "Open Oura",
+
   // Unlock link: the Citi Bike system's own scan-to-unlock link (from its live feed).
   unlockUrl: "https://bkn.lft.to/lastmile_qr_scan",
 
   // Daily thought: one author per day, quote pulled from their Wikiquote page.
   quoteAuthors: [
-    { name: "Alan Watts",    page: "Alan_Watts" },
-    { name: "Ram Dass",      page: "Ram_Dass" },
-    { name: "Deepak Chopra", page: "Deepak_Chopra" },
+    { name: "Alan Watts",      page: "Alan_Watts" },
+    { name: "Tao Te Ching",    page: "Tao_Te_Ching" },
+    { name: "Ram Dass",        page: "Ram_Dass" },
+    { name: "Marcus Aurelius", page: "Marcus_Aurelius" },
+    { name: "Deepak Chopra",   page: "Deepak_Chopra" },
   ],
+
+  // Subway: GTFS stop J30 = Gates Av. "S" = Manhattan-bound there, "N" = outbound.
+  train: { stop: "J30", feed: "jz", name: "Gates Av", towardDir: "S", toward: "Manhattan", otherDir: "N", other: "Outbound" },
+
+  // Service alerts to watch
+  alertRoutes: ["J", "Z", "B52"],
 
 
   coins: ["bitcoin", "ethereum", "solana", "zcash", "chainlink"],
@@ -275,10 +414,14 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 const getJSON = async url => { const r = await fetch(url, {cache:"no-store"}); if (!r.ok) throw new Error(r.status); return r.json(); };
 const tz = "America/New_York";
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const RELAY = (CONFIG.bus.relay || "").replace(/\/$/, "");
+const S = {};   // what each section found, for the greeting
+const nyHour = () => +new Date().toLocaleString("en-US",{timeZone:tz,hour:"numeric",hour12:false}) % 24;
 
 const ICON = {
   bike: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17" r="3.5"/><circle cx="18.5" cy="17" r="3.5"/><path d="M5.5 17 9 9h6l3.5 8M9 9 12 17h-3M14 6h2"/></svg>',
   bus:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 11h16M8 21v-3M16 21v-3"/><circle cx="8" cy="14.5" r=".6" fill="currentColor"/><circle cx="16" cy="14.5" r=".6" fill="currentColor"/></svg>',
+  train: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 10h14M8 21l2-4M16 21l-2-4"/><circle cx="9" cy="13.5" r=".6" fill="currentColor"/><circle cx="15" cy="13.5" r=".6" fill="currentColor"/></svg>',
   scan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg>',
   dock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
 };
@@ -305,7 +448,40 @@ const themeFor = (code, isDay) => {
   if (code === 2) return "cloudy";
   return "overcast";
 };
+/* ---------- Modes: sky (weather), paper (pre-dawn), dim (evening before an early shift) ---------- */
+const MODE_SKY = { paper: { sky1:"#EEF1F4", sky2:"#DCE2E8", glow:"rgba(255,255,255,0)" },
+                   dim:   { sky1:"#120D09", sky2:"#1E1610", glow:"rgba(255,170,90,.06)" } };
+const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const nyDow = () => DOW.indexOf(new Date().toLocaleDateString("en-US",{timeZone:tz,weekday:"short"}));
+const nyMin = () => { const p = new Date().toLocaleTimeString("en-GB",{timeZone:tz,hour12:false}).split(":"); return (+p[0] % 24)*60 + +p[1]; };
+const toMin = hhmm => { const [h,m] = hhmm.split(":").map(Number); return h*60 + m; };
+const clock12 = m => { const h = Math.floor(m/60) % 24, mm = String(m % 60).padStart(2,"0"); return `${h%12||12}:${mm}`; };
+function shiftInfo(){
+  const d = nyDow(), today = CONFIG.shifts[d], tomorrow = CONFIG.shifts[(d+1) % 7], now = nyMin();
+  const t = today ? { start: toMin(today), leave: toMin(today) - CONFIG.leaveBefore } : null;
+  return { workToday: !!t && now < t.start, t, now, tomorrow: tomorrow ? { start: toMin(tomorrow), leave: toMin(tomorrow) - CONFIG.leaveBefore } : null };
+}
+function currentMode(){
+  const forced = new URLSearchParams(location.search).get("mode");
+  if (forced && (forced in MODE_SKY || forced === "sky")) return forced;
+  const h = nyHour(), si = shiftInfo();
+  if (h >= CONFIG.windDownFrom && si.tomorrow) return "dim";
+  const sr = S.wx?.sunrise ? toMin(S.wx.sunrise.slice(11,16)) : 7*60;
+  if (h >= 2 && si.now < sr) return "paper";
+  return "sky";
+}
+function applyMode(){
+  const m = currentMode(); document.documentElement.dataset.mode = m;
+  if (m !== "sky"){ const t = MODE_SKY[m], r = document.documentElement.style;
+    r.setProperty("--sky1", t.sky1); r.setProperty("--sky2", t.sky2); r.setProperty("--glow", t.glow);
+    document.querySelector('meta[name="theme-color"]').content = t.sky1; fxKind = ""; startFx("none"); }
+  else applyTheme(lastSky);
+  return m;
+}
+let lastSky = "clear";
 function applyTheme(name){
+  lastSky = name;
+  if (document.documentElement.dataset.mode && document.documentElement.dataset.mode !== "sky") return;
   const t = THEMES[name] || THEMES.clear, r = document.documentElement.style;
   r.setProperty("--sky1", t.sky1); r.setProperty("--sky2", t.sky2); r.setProperty("--glow", t.glow);
   document.querySelector('meta[name="theme-color"]').content = t.sky1;
@@ -367,7 +543,7 @@ async function loadWeather(){
   const {lat,lon} = CONFIG.weather;
   const d = await getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`+
     `&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,is_day`+
-    `&hourly=temperature_2m,precipitation_probability&daily=temperature_2m_max,temperature_2m_min`+
+    `&hourly=temperature_2m,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max`+
     `&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=${encodeURIComponent(tz)}&forecast_days=2`);
   const c = d.current;
   const forced = new URLSearchParams(location.search).get("wx");
@@ -382,9 +558,35 @@ async function loadWeather(){
   $("wxTemp").innerHTML = `<p class="temp">${Math.round(c.temperature_2m)}°</p>`;
   $("wx").innerHTML = `<div class="cond">${esc(WMO[c.weather_code] || "—")}</div>
     <div class="meta">Feels ${Math.round(c.apparent_temperature)}° · H ${Math.round(d.daily.temperature_2m_max[0])}° L ${Math.round(d.daily.temperature_2m_min[0])}° · Wind ${Math.round(c.wind_speed_10m)} mph</div>
-    <div class="line">${line}</div>`;
+    <div class="line">${line}</div>
+    <div class="chips" id="wxChips"></div>`;
+  const clock = t => { const h = +t.slice(11,13), m = t.slice(14,16); return `${h%12||12}:${m}${h<12?"a":"p"}`; };
+  S.wx = { temp: Math.round(c.temperature_2m), code: c.weather_code, cond: WMO[c.weather_code] || "",
+    hi: Math.round(d.daily.temperature_2m_max[0]), wind: Math.round(c.wind_speed_10m), wet, hrs,
+    uvMax: Math.round(d.daily.uv_index_max?.[0] ?? 0), sunrise: d.daily.sunrise?.[0], sunset: d.daily.sunset?.[0] };
+  applyMode();
+  S.wx.chips = { uv: `UV ${S.wx.uvMax} max`, sun: S.wx.sunrise ? `Sun ${clock(S.wx.sunrise)} – ${clock(S.wx.sunset)}` : "" };
+  renderChips();
   $("hours").innerHTML = hrs.map((h,i) => `<div class="hr"><div class="hr-t">${i===0?"Now":hourName(h.t)}</div>
     <div class="hr-temp">${h.temp}°</div><div class="hr-p">${h.p>=20?`${h.p}%<i style="opacity:${.3+h.p/140}"></i>`:""}</div></div>`).join("");
+}
+
+/* ---------- Air quality (Open-Meteo) ---------- */
+const aqiCat = a => a <= 50 ? ["Good","#6CF0A8"] : a <= 100 ? ["Moderate","#FFD36E"] : a <= 150 ? ["Unhealthy for some","#FFA25F"]
+  : a <= 200 ? ["Unhealthy","#FF7A7A"] : ["Very unhealthy","#C78BFF"];
+async function loadAir(){
+  const {lat,lon} = CONFIG.weather;
+  const d = await getJSON(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi&timezone=${encodeURIComponent(tz)}`);
+  const a = Math.round(d.current?.us_aqi ?? NaN); if (isNaN(a)) return;
+  S.aqi = a; renderChips();
+}
+function renderChips(){
+  const el = $("wxChips"); if (!el || !S.wx) return;
+  const parts = [];
+  if (S.aqi != null){ const [cat, col] = aqiCat(S.aqi); parts.push(`<span class="chip"><i style="background:${col}"></i>Air ${S.aqi} · ${cat}</span>`); }
+  parts.push(`<span class="chip">${esc(S.wx.chips.uv)}</span>`);
+  if (S.wx.chips.sun) parts.push(`<span class="chip">${esc(S.wx.chips.sun)}</span>`);
+  el.innerHTML = parts.join("");
 }
 
 /* ---------- Citi Bike (GBFS) ---------- */
@@ -410,6 +612,9 @@ async function loadBikes(){
   const split = s => { const e = s.num_ebikes_available ?? 0; return { e, c: Math.max(0,(s.num_bikes_available ?? 0) - e) }; };
 
   const h = pick(CONFIG.home), hp = h.primary, hb = split(hp);
+  const bestNear = h.rest.slice(0, 4).map(s => ({ s, n: (s.num_bikes_available ?? 0) })).sort((a,b) => b.n - a.n)[0];
+  S.home = { name: hp.name, c: hb.c, e: hb.e, renting: hp.is_renting !== 0,
+             alt: bestNear ? { name: bestNear.s.name, n: bestNear.n, walk: walk(bestNear.s.dist) } : null };
   $("home").innerHTML = `<div class="t-label">${ICON.bike}${esc(CONFIG.home.label)}</div>
     <div class="t-name">${esc(hp.name)}</div>
     ${hp.is_renting === 0 ? `<p class="msg bad">Not renting right now.</p>` :
@@ -425,6 +630,8 @@ async function loadBikes(){
   const named = (CONFIG.work.alts || []).map(ws => w.rest.find(s => ws.every(x => s.name.toLowerCase().includes(x)))).filter(Boolean);
   const backups = [...named, ...w.rest.filter(s => !named.includes(s))].slice(0, CONFIG.work.nearby);
   const docks = s => s.is_returning === 0 ? 0 : (s.num_docks_available ?? 0);
+  const bestAlt = [...backups].sort((a,b) => docks(b) - docks(a))[0];
+  S.work = { name: wp.name, docks: docks(wp), alt: bestAlt ? { name: bestAlt.name, n: docks(bestAlt) } : null };
   $("work").innerHTML = `<div class="t-label">${ICON.dock}${esc(CONFIG.work.label)}</div>
     <div class="t-name">${esc(wp.name)}</div>
     <div class="n-sm ${tone(docks(wp))}">${docks(wp)}<span class="unit">open</span></div>
@@ -472,10 +679,45 @@ async function loadBus(){
     return { mins: t ? Math.max(0, Math.round((new Date(t) - Date.now())/60000)) : null,
              away: c.ArrivalProximityText || c.Extensions?.Distances?.PresentableDistance || "" }; });
   if (!rows.length){ el.innerHTML = head + `<p class="msg">No downtown buses tracked right now.</p>`; return; }
+  S.bus = rows.map(r => r.mins).filter(m => m != null);
   const [f, ...more] = rows;
   el.innerHTML = head + `<div class="n-sm">${f.mins ?? "–"}<span class="unit">min</span></div>
     <div class="bus-sub">${esc(f.away)}</div>
     ${more.length ? `<div class="bus-next">${more.map(r => `<span>${r.mins ?? "–"}<span class="unit">min</span></span>`).join("")}</div>` : ""}`;
+}
+
+/* ---------- J train at Gates Av (via relay) ---------- */
+async function loadTrain(){
+  const t = CONFIG.train, el = $("train");
+  const head = `<div class="t-label">${ICON.train}<span class="bullet">J</span>${esc(t.toward)}</div><div class="t-name">${esc(t.name)}</div>`;
+  if (!RELAY){ el.innerHTML = head + `<p class="msg">Needs the relay.</p>`; return; }
+  const d = await getJSON(`${RELAY}/subway?stop=${t.stop}&feed=${t.feed}`);
+  if (d.error) throw new Error(d.error);
+  const mins = a => Math.max(0, Math.round((a.time*1000 - Date.now())/60000));
+  const to = (d.arrivals || []).filter(a => a.dir === t.towardDir), other = (d.arrivals || []).filter(a => a.dir === t.otherDir);
+  S.train = { to: to.map(mins), other: other.map(mins) };
+  if (!to.length){ el.innerHTML = head + `<p class="msg">No ${esc(t.toward)}-bound trains tracked right now.</p>`; return; }
+  const [f, ...more] = to;
+  el.innerHTML = head + `<div class="n-sm">${mins(f)}<span class="unit">min${f.route !== "J" ? " · " + esc(f.route) : ""}</span></div>
+    ${more.length ? `<div class="bus-next">${more.slice(0,2).map(a => `<span>${mins(a)}<span class="unit">min</span></span>`).join("")}</div>` : ""}
+    ${other.length ? `<div class="bus-sub">${esc(t.other)}: ${other.slice(0,2).map(mins).join(", ")} min</div>` : ""}`;
+}
+
+/* ---------- Service alerts (via relay) ---------- */
+async function loadAlerts(){
+  if (!RELAY) return;
+  const d = await getJSON(`${RELAY}/alerts?routes=${CONFIG.alertRoutes.join(",")}`);
+  S.alerts = d.alerts || [];
+}
+function renderAlerts(){
+  document.querySelectorAll(".alert").forEach(n => n.remove());
+  for (const a of S.alerts || []){
+    const isBus = a.routes.includes(CONFIG.bus.route), tile = $(isBus ? "bus" : "train");
+    if (!tile || tile.querySelector(".alert")) continue;
+    const div = document.createElement("div"); div.className = "alert";
+    div.innerHTML = `<span><b>${esc(a.type || "Service alert")}:</b> ${esc(a.header)}</span>`;
+    tile.appendChild(div);
+  }
 }
 
 /* ---------- Crypto (CoinGecko markets: price, logo, 7-day line) ---------- */
@@ -487,14 +729,21 @@ function spark(pts, up){
   const mn = Math.min(...p), mx = Math.max(...p), rg = mx - mn || 1;
   const xy = p.map((v,i) => [ (i/(p.length-1))*76, 27 - ((v-mn)/rg)*24 ]);
   const d = xy.map((q,i) => (i?"L":"M") + q[0].toFixed(1) + " " + q[1].toFixed(1)).join("");
-  const col = up ? "var(--good)" : "var(--bad)", id = "g" + Math.random().toString(36).slice(2,7);
+  const col = up ? "var(--good)" : "var(--down)", id = "g" + Math.random().toString(36).slice(2,7);
   return `<svg class="spark" viewBox="0 0 76 30" preserveAspectRatio="none" aria-hidden="true">
-    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${up?"#6CF0A8":"#FF7A7A"}" stop-opacity=".35"/><stop offset="1" stop-color="${up?"#6CF0A8":"#FF7A7A"}" stop-opacity="0"/></linearGradient></defs>
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${up?"#6CF0A8":"#9AA5B1"}" stop-opacity=".3"/><stop offset="1" stop-color="${up?"#6CF0A8":"#9AA5B1"}" stop-opacity="0"/></linearGradient></defs>
     <path d="${d}L76 30L0 30Z" fill="url(#${id})"/><path d="${d}" fill="none" stroke="${col}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
 }
 async function loadCoins(){
   const d = await getJSON(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${CONFIG.coins.join(",")}&sparkline=true&price_change_percentage=24h`);
   const byId = new Map(d.map(c => [c.id, c]));
+  const list = CONFIG.coins.map(id => byId.get(id)).filter(Boolean);
+  $("ticker").innerHTML = list.map(c => { const ch = c.price_change_percentage_24h ?? 0;
+    return `<div class="tk"><img src="${esc(c.image)}" alt=""><b>${esc(c.symbol.toUpperCase())}</b><span>${usd(c.current_price)}</span>
+      <em class="${ch>=0?"good":"down"}">${ch>=0?"+":""}${ch.toFixed(1)}%</em></div>`; }).join("") +
+    `<button class="tk-btn" id="tkBtn" type="button" aria-expanded="${!$("coins").hidden}">${$("coins").hidden ? "7-day charts" : "Hide charts"}</button>`;
+  $("tkBtn").onclick = () => { const c = $("coins"); c.hidden = !c.hidden;
+    $("tkBtn").textContent = c.hidden ? "7-day charts" : "Hide charts"; $("tkBtn").setAttribute("aria-expanded", !c.hidden); };
   $("coins").innerHTML = CONFIG.coins.map(id => byId.get(id)).filter(Boolean).map(c => {
     const ch = c.price_change_percentage_24h ?? 0, s = c.sparkline_in_7d?.price || [];
     return `<div class="coin"><img src="${esc(c.image)}" alt="" loading="lazy">
@@ -542,14 +791,26 @@ async function loadTeam(t){
   if (next){ const s = sides(next);
     nextHTML = `<div class="next">${s.ologo ? `<img class="logo-sm" src="${esc(s.ologo)}" alt="">` : ""}<span>${s.vs} ${esc(s.opp)} · ${fmtDay(next.date)} ${fmtTime(next.date)}</span></div>`; }
   const games = ev.map(e => { const s = sides(e); return { date: e.date, vs: s.vs, opp: s.opp, ologo: s.ologo }; });
-  return { logo: ok[0].team?.logo || logoOf(ok[0].team) || t.logo, html: `<div>${resHTML}</div>${nextHTML}`, games };
+  const info = { live: !!live, lastDate: last?.date, nextDate: next?.date };
+  if (live){ const s = sides(live); info.liveScore = { my: scoreOf(s.me), op: scoreOf(s.op), opp: s.opp }; }
+  if (last){ const s = sides(last); info.last = { won: s.me.winner === true, my: scoreOf(s.me), op: scoreOf(s.op), opp: s.opp }; }
+  if (next){ const s = sides(next); info.next = { vs: s.vs, opp: s.opp }; }
+  return { logo: ok[0].team?.logo || logoOf(ok[0].team) || t.logo, html: `<div>${resHTML}</div>${nextHTML}`, games, info };
 }
 async function loadTeams(teamsP){
-  const out = await teamsP;
-  $("teams").innerHTML = out.map((r,i) => { const t = CONFIG.teams[i], v = r.status === "fulfilled" ? r.value : null;
+  const out = await teamsP, now = Date.now();
+  // Only teams that just played, are playing, or play soon get a full tile
+  const hot = v => v && (v.info.live || (v.info.lastDate && now - new Date(v.info.lastDate) < 36*3600e3)
+                         || (v.info.nextDate && new Date(v.info.nextDate) - now < 48*3600e3));
+  S.teams = out.map((r,i) => ({ t: CONFIG.teams[i], v: r.status === "fulfilled" ? r.value : null }));
+  const active = S.teams.filter(x => hot(x.v)), quiet = S.teams.filter(x => !hot(x.v));
+  $("teamsOff").innerHTML = quiet.map(({t, v}) => `<span class="glass off-chip"><img class="logo-sm" src="${esc(v?.logo || t.logo)}" alt="">${esc(t.short || t.name)} · ${
+      v?.info.nextDate ? "next " + new Date(v.info.nextDate).toLocaleDateString("en-US",{timeZone:tz,month:"short",day:"numeric"}) : v ? "off-season" : "no data"}</span>`).join("");
+  $("teams").hidden = !active.length;
+  $("teams").innerHTML = active.map(({t, v}) => {
     return `<div class="glass team"><div class="t-head"><img class="logo" src="${esc(v?.logo || t.logo)}" alt="">
       <div><div class="t-team">${esc(t.name)}</div><div class="t-league">${esc(t.league)}</div></div></div>
-      ${v ? v.html : `<div class="when">Scores didn't load</div>`}</div>`; }).join("");
+      ${v.html}</div>`; }).join("");
 }
 
 /* ---------- Daily thought (Wikiquote) & On this day (Wikipedia) ---------- */
@@ -559,53 +820,62 @@ const pickIdx = (n, salt) => (Math.imul(dayNum()+salt, 2654435761) >>> 0) % n;
 const cacheGet = k => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch(e){ return null; } };
 const cacheSet = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
 
+const PROMPTS = [
+  "What would make today feel well spent?", "Where can you slow down by ten percent today?",
+  "What are you holding onto that you could set down?", "Who could use a kind word from you today?",
+  "What's one thing you're looking forward to?", "What would you do today if you trusted yourself completely?",
+  "What can you let be exactly as it is?", "Take three slow breaths before you pick up your phone again.",
+  "What's the smallest step that moves the important thing forward?", "What are you grateful for that you usually overlook?",
+  "Where are you rushing that you don't need to?", "What would a calmer version of you do first?",
+  "What's worth your full attention today?", "What story are you telling yourself that might not be true?",
+  "How do you want to feel at the end of today?", "What can you do today that your future self will thank you for?",
+  "Where could you choose curiosity over judgment?", "What's one thing you can do just for the joy of it?",
+  "Who taught you something you still use? Thank them, even silently.", "What are you avoiding, and what would it take to start?",
+  "Pick one ordinary moment today to fully notice.", "What does enough look like today?",
+  "What would you try if it didn't have to be perfect?", "Where can you listen more than you speak today?",
+  "What's within your control this morning, and what isn't?", "What small kindness can you do without anyone knowing?",
+  "What made you laugh recently? Bring that with you.", "What can you simplify today?",
+  "What would it mean to be fully here for the next hour?", "What's one thing you can forgive, including in yourself?",
+  "Breathe in for four, out for six, three times. What changed?",
+];
+async function quotesFor(a){
+  const d = await getJSON(`https://en.wikiquote.org/w/api.php?action=parse&page=${a.page}&prop=text&format=json&formatversion=2&origin=*`);
+  const doc = new DOMParser().parseFromString(d.parse.text, "text/html");
+  const root = doc.querySelector(".mw-parser-output") || doc.body;
+  const skip = /disputed|misattributed|about|external|see also|sources|references|notes|attributed|quotes about/i;
+  const junk = /translat|variant|as quoted|isbn|\bp\.\s?\d|\bpp\.|chapter \d|^ch\.|^book [ivx\d]/i;
+  let section = "", quotes = [];
+  for (const el of root.children){
+    const h2 = el.matches("h2") ? el : el.querySelector(":scope > h2");
+    if (h2){ section = h2.textContent; continue; }
+    if (el.tagName !== "UL" || skip.test(section)) continue;
+    for (const li of el.querySelectorAll(":scope > li")){
+      const c = li.cloneNode(true); c.querySelectorAll("ul, sup, .reference, style").forEach(n => n.remove());
+      const t = c.textContent.replace(/\s+/g," ").trim();
+      if (t.length >= 40 && t.length <= 300 && !junk.test(t)) quotes.push(t);
+    }
+  }
+  return quotes;
+}
 async function loadThought(){
-  const key = "thought:" + todayKey();
+  const key = "thought2:" + todayKey();
   let q = cacheGet(key);
   if (!q){
-    const a = CONFIG.quoteAuthors[dayNum() % CONFIG.quoteAuthors.length];
-    const d = await getJSON(`https://en.wikiquote.org/w/api.php?action=parse&page=${a.page}&prop=text&format=json&formatversion=2&origin=*`);
-    const doc = new DOMParser().parseFromString(d.parse.text, "text/html");
-    const root = doc.querySelector(".mw-parser-output") || doc.body;
-    const skip = /disputed|misattributed|about|external|see also|sources|references|notes/i;
-    let section = "", quotes = [];
-    for (const el of root.children){
-      const h2 = el.matches("h2") ? el : el.querySelector(":scope > h2");
-      if (h2){ section = h2.textContent; continue; }
-      if (el.tagName !== "UL" || skip.test(section)) continue;
-      for (const li of el.querySelectorAll(":scope > li")){
-        const c = li.cloneNode(true); c.querySelectorAll("ul, sup, .reference").forEach(n => n.remove());
-        const t = c.textContent.replace(/\s+/g," ").trim();
-        if (t.length >= 40 && t.length <= 280) quotes.push(t);
-      }
+    const A = CONFIG.quoteAuthors;
+    for (let k = 0; k < A.length && !q; k++){           // today's voice first, then the next if that page won't parse
+      const a = A[(dayNum() + k) % A.length];
+      const list = await quotesFor(a).catch(() => []);
+      if (list.length) q = { text: list[pickIdx(list.length, 3)], by: a.name, url: `https://en.m.wikiquote.org/wiki/${a.page}` };
     }
-    if (!quotes.length) throw new Error("no quotes");
-    q = { text: quotes[pickIdx(quotes.length, 3)], by: a.name, url: `https://en.m.wikiquote.org/wiki/${a.page}` };
+    if (!q) throw new Error("no quotes");
     cacheSet(key, q);
   }
+  const prompt = PROMPTS[dayNum() % PROMPTS.length];
   const el = $("thought");
   el.innerHTML = `<p class="q">“${esc(q.text.replace(/^["“]|["”]$/g,""))}”</p>
-    <div class="q-by">${esc(q.by)} · <a href="${esc(q.url)}">more</a></div>`;
+    <div class="q-by">${esc(q.by)} · <a href="${esc(q.url)}">more</a></div>
+    <div class="reflect"><b>SIT WITH THIS</b>${esc(prompt)}</div>`;
   el.hidden = false;
-}
-
-async function loadFact(){
-  const key = "fact:" + todayKey();
-  let f = cacheGet(key);
-  if (!f){
-    const [mm, dd] = todayKey().slice(5).split("-");
-    const d = await getJSON(`https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${mm}/${dd}`);
-    const ev = (d.events || []).filter(e => e.pages?.[0]?.content_urls && e.text);
-    if (!ev.length) throw new Error("no events");
-    const e = ev[pickIdx(ev.length, 11)], pg = e.pages[0];
-    f = { year: e.year, text: e.text, url: pg.content_urls.mobile?.page || pg.content_urls.desktop?.page,
-          title: pg.titles?.normalized || pg.title || "", img: pg.thumbnail?.source || "" };
-    cacheSet(key, f);
-  }
-  $("fact").innerHTML = `<div><div class="f-year">${esc(f.year)}</div><p class="f-text">${esc(f.text)}</p>
-    <a class="f-link" href="${esc(f.url)}">Read more on Wikipedia</a></div>
-    ${f.img ? `<img class="f-img" src="${esc(f.img)}" alt="">` : ""}`;
-  $("factWrap").hidden = false;
 }
 
 /* ---------- Month calendar: holidays, observances, your teams' games ---------- */
@@ -650,6 +920,9 @@ async function loadMonth(teamsP){
     const k = `${mm < m ? y+1 : y}-${String(mm+1).padStart(2,"0")}-${String(o.day).padStart(2,"0")}`;
     if (k >= todayKey()) upcoming.push({ key: k, hol: true, text: o.name }); });
   upcoming.sort((a,b) => a.key.localeCompare(b.key) || (a.hol ? -1 : 1));
+  const tmr = new Date(Date.parse(todayKey()+"T12:00:00Z") + 864e5).toISOString().slice(0,10);
+  S.holToday = upcoming.filter(u => u.hol && u.key === todayKey()).map(u => u.text);
+  S.holTomorrow = upcoming.filter(u => u.hol && u.key === tmr).map(u => u.text);
 
   const first = new Date(Date.UTC(y, m, 1)).getUTCDay(), days = new Date(Date.UTC(y, m+1, 0)).getUTCDate();
   const monthName = new Date(Date.UTC(y, m, 15)).toLocaleDateString("en-US",{month:"long",timeZone:"UTC"});
@@ -672,6 +945,281 @@ async function loadMonth(teamsP){
   $("agenda").hidden = false; $("heroRow").classList.add("has-agenda");
 }
 
+/* ---------- Italian: one phrase a day, in order ---------- */
+// [italian, pronunciation, english, example (it), example (en), note]
+const ITA = [
+["Buongiorno","bwon-JOR-no","Good morning / good day","Buongiorno! Come stai?","Good morning! How are you?","Used until early afternoon, then switch to buonasera."],
+["Come stai?","KO-meh STAI","How are you? (informal)","Ciao Marco, come stai?","Hi Marco, how are you?","With strangers or elders, use the formal: Come sta?"],
+["Sto bene, grazie","sto BEH-neh, GRAH-tsyeh","I'm well, thanks","Sto bene, grazie. E tu?","I'm well, thanks. And you?",""],
+["Piacere","pyah-CHEH-reh","Nice to meet you","Piacere, sono Luca.","Nice to meet you, I'm Luca.","Literally \"pleasure.\""],
+["Per favore","pehr fah-VO-reh","Please","Un caffè, per favore.","A coffee, please.","Per piacere works too."],
+["Prego","PREH-go","You're welcome / go ahead","— Grazie! — Prego.","— Thanks! — You're welcome.","Also used to invite someone in, or to let them go first."],
+["Scusi","SKOO-zee","Excuse me (formal)","Scusi, dov'è la stazione?","Excuse me, where's the station?","Informal: scusa."],
+["Non lo so","non lo SO","I don't know","Non lo so, mi dispiace.","I don't know, sorry.",""],
+["Mi dispiace","mee dee-SPYAH-cheh","I'm sorry","Mi dispiace per il ritardo.","Sorry for the delay.",""],
+["Va bene","vah BEH-neh","Okay / that works","Ci vediamo alle otto? Va bene.","See you at eight? Okay.","The everyday Italian \"OK.\""],
+["A dopo","ah DO-po","See you later","Ciao, a dopo!","Bye, see you later!","Later today. For tomorrow: a domani."],
+["A domani","ah do-MAH-nee","See you tomorrow","Buonanotte, a domani!","Good night, see you tomorrow!",""],
+["Un caffè","oon kahf-FEH","An espresso","Prendo un caffè al banco.","I'll have an espresso at the counter.","In Italy, un caffè is an espresso. Standing at the counter (al banco) costs less."],
+["Il conto, per favore","eel KON-to, pehr fah-VO-reh","The check, please","Possiamo avere il conto, per favore?","Can we have the check, please?",""],
+["Quanto costa?","KWAN-to KO-stah","How much is it?","Quanto costa questo pane?","How much is this bread?",""],
+["Vorrei…","vor-RAY","I would like…","Vorrei una pizza margherita.","I'd like a margherita pizza.","Softer and more polite than voglio (I want)."],
+["la farina","lah fah-REE-nah","flour","Mi serve un chilo di farina.","I need a kilo of flour.",""],
+["il lievito","eel LYEH-vee-to","yeast, leavening","Il lievito madre ha bisogno di tempo.","Sourdough starter needs time.","Lievito madre = sourdough starter."],
+["l'impasto","leem-PAH-sto","the dough","L'impasto deve riposare.","The dough needs to rest.",""],
+["il forno","eel FOR-no","the oven","Il forno è caldissimo.","The oven is very hot.","-issimo intensifies: caldo → caldissimo."],
+["buonissimo","bwo-NEES-see-mo","delicious, really good","Questa pizza è buonissima!","This pizza is delicious!","It agrees with the noun: buonissimo / buonissima."],
+["Che ore sono?","keh O-reh SO-no","What time is it?","Scusi, che ore sono?","Excuse me, what time is it?",""],
+["Sono le quattro","SO-no leh KWAT-tro","It's four o'clock","Sono le quattro e mezza.","It's four-thirty.","One o'clock is singular: è l'una."],
+["presto","PREH-sto","early / soon","Domani mi sveglio presto.","Tomorrow I wake up early.","A presto = see you soon."],
+["tardi","TAR-dee","late","È tardi, devo andare.","It's late, I have to go.",""],
+["svegliarsi","zveh-LYAR-see","to wake up","Mi sveglio alle tre.","I wake up at three.","Reflexive: mi sveglio, ti svegli, si sveglia."],
+["il lavoro","eel lah-VO-ro","work, job","Vado al lavoro in bici.","I go to work by bike.",""],
+["la bici","lah BEE-chee","bike","Prendo la bici o l'autobus?","Do I take the bike or the bus?","Short for bicicletta."],
+["la fermata","lah fehr-MAH-tah","the stop (bus, tram)","La fermata è all'angolo.","The stop is on the corner.",""],
+["Dov'è…?","do-VEH","Where is…?","Dov'è la metropolitana?","Where's the subway?",""],
+["a destra / a sinistra","ah DEH-strah / ah see-NEE-strah","to the right / to the left","Gira a destra al semaforo.","Turn right at the traffic light.",""],
+["sempre dritto","SEM-preh DREET-to","straight ahead","Vai sempre dritto per due minuti.","Go straight ahead for two minutes.",""],
+["il tempo","eel TEM-po","the weather / time","Che tempo fa oggi?","What's the weather like today?","The same word means time and weather."],
+["Fa freddo","fah FRED-do","It's cold","Fa freddo stamattina.","It's cold this morning.","Fa caldo = it's hot."],
+["Piove","PYO-veh","It's raining","Piove, prendo l'ombrello.","It's raining, I'm taking the umbrella.",""],
+["stamattina","stah-maht-TEE-nah","this morning","Stamattina c'è il sole.","This morning it's sunny.","Sta- means this: stasera (this evening), stanotte (tonight)."],
+["oggi / domani / ieri","OD-jee / do-MAH-nee / YEH-ree","today / tomorrow / yesterday","Oggi lavoro, domani no.","Today I work, tomorrow I don't.",""],
+["Ho fame","oh FAH-meh","I'm hungry","Ho fame, mangiamo?","I'm hungry, shall we eat?","Italian \"has\" hunger: avere fame, avere sete (thirsty)."],
+["Ho sonno","oh SON-no","I'm sleepy","Ho ancora sonno.","I'm still sleepy.",""],
+["stanco","STAN-ko","tired","Sono stanco ma contento.","I'm tired but happy.","Feminine: stanca."],
+["contento","kon-TEN-to","happy, pleased","Sono contento di vederti.","I'm happy to see you.",""],
+["Che bello!","keh BEL-lo","How lovely!","Che bello vederti!","How nice to see you!","An endlessly useful reaction."],
+["Dai!","DAI","Come on!","Dai, andiamo!","Come on, let's go!","Encouragement, urging, or disbelief, depending on tone."],
+["Magari","mah-GAH-ree","I wish / maybe","— Vieni in Italia? — Magari!","— Coming to Italy? — I wish!","Also \"maybe\": magari domani."],
+["Allora","ahl-LO-rah","So / well then","Allora, cosa facciamo?","So, what are we doing?","The classic Italian filler word."],
+["Boh","boh","Dunno (with a shrug)","— Dov'è Marco? — Boh.","— Where's Marco? — No idea.","Very casual."],
+["Figurati","fee-GOO-rah-tee","Don't mention it","— Grazie mille! — Figurati!","— Thanks so much! — Don't mention it!","Formal: si figuri."],
+["In bocca al lupo","een BOK-kah ahl LOO-po","Good luck","In bocca al lupo per il colloquio!","Good luck with the interview!","Literally \"into the wolf's mouth.\" The reply is crepi!"],
+["Piano piano","PYAH-no PYAH-no","little by little","Piano piano, impari tutto.","Little by little, you learn everything.","Doubling an adverb intensifies it."],
+["Ci vuole pazienza","chee VWO-leh pah-TSYEN-tsah","It takes patience","Con l'impasto ci vuole pazienza.","With dough, it takes patience.","Ci vuole + singular, ci vogliono + plural."],
+["essere","ES-seh-reh","to be","Io sono, tu sei, lui è.","I am, you are, he is.",""],
+["avere","ah-VEH-reh","to have","Io ho, tu hai, lei ha.","I have, you have, she has.","The h is silent."],
+["andare","ahn-DAH-reh","to go","Vado a casa.","I'm going home.","Irregular: vado, vai, va."],
+["fare","FAH-reh","to do, to make","Cosa fai oggi?","What are you doing today?","Fare colazione = to have breakfast."],
+["la colazione","lah ko-lah-TSYO-neh","breakfast","A colazione prendo un cornetto.","For breakfast I have a cornetto.",""],
+["il pranzo / la cena","eel PRAN-dzo / lah CHEH-nah","lunch / dinner","La cena è alle otto.","Dinner is at eight.",""],
+["Mi piace","mee PYAH-cheh","I like it","Mi piace il caffè forte.","I like strong coffee.","For plural things: mi piacciono."],
+["Non mi piace","non mee PYAH-cheh","I don't like it","Non mi piace la fretta.","I don't like rushing.",""],
+["la fretta","lah FRET-tah","hurry, rush","Non c'è fretta.","There's no rush.","Avere fretta = to be in a hurry."],
+["Con calma","kon KAHL-mah","Take your time","Fai con calma.","Take your time.",""],
+["respirare","reh-spee-RAH-reh","to breathe","Respira piano.","Breathe slowly.",""],
+["la pace","lah PAH-cheh","peace","Cerco un po' di pace.","I'm looking for a bit of peace.",""],
+["un po'","oon PO","a little","Parlo un po' di italiano.","I speak a little Italian.","Short for un poco."],
+["Parla inglese?","PAR-lah een-GLEH-zeh","Do you speak English? (formal)","Scusi, parla inglese?","Excuse me, do you speak English?",""],
+["Non capisco","non kah-PEE-sko","I don't understand","Scusi, non capisco.","Sorry, I don't understand.",""],
+["Può ripetere?","pwo ree-PEH-teh-reh","Could you repeat that?","Può ripetere più piano?","Could you repeat that more slowly?",""],
+["Come si dice…?","KO-meh see DEE-cheh","How do you say…?","Come si dice \"oven\" in italiano?","How do you say \"oven\" in Italian?",""],
+["uno, due, tre","OO-no, DOO-eh, treh","one, two, three","Uno, due, tre, via!","One, two, three, go!",""],
+["quattro, cinque, sei","KWAT-tro, CHEEN-kweh, SAY","four, five, six","Lavoro alle cinque.","I work at five.",""],
+["sette, otto, nove, dieci","SET-teh, OT-to, NO-veh, DYEH-chee","seven, eight, nine, ten","Vado a dormire alle nove.","I go to bed at nine.",""],
+["il fine settimana","eel FEE-neh set-tee-MAH-nah","the weekend","Cosa fai nel fine settimana?","What are you doing this weekend?",""],
+["lunedì","loo-neh-DEE","Monday","Lunedì comincio presto.","On Monday I start early.","Days of the week aren't capitalized in Italian."],
+["la domenica","lah do-MEH-nee-kah","Sunday","La domenica si mangia insieme.","On Sundays, people eat together.","Domenica is the only feminine day of the week."],
+["insieme","een-SYEH-meh","together","Mangiamo insieme stasera?","Shall we eat together tonight?",""],
+["la famiglia","lah fah-MEE-lyah","family","La famiglia è tutto.","Family is everything.","Gli sounds like the \"lli\" in million."],
+["il cane","eel KAH-neh","the dog","Porto fuori il cane.","I'm taking the dog out.","Careful: cane (dog) vs. carne (meat)."],
+["la passeggiata","lah pahs-sed-JAH-tah","a stroll","Facciamo una passeggiata?","Shall we take a walk?","The evening stroll is a tradition: la passeggiata."],
+["Andiamo!","ahn-DYAH-mo","Let's go!","Andiamo, è tardi!","Let's go, it's late!",""],
+["Aspetta","ah-SPET-tah","Wait","Aspetta un attimo!","Wait a sec!","Un attimo = just a moment."],
+["Tutto bene?","TOOT-to BEH-neh","Everything OK?","Tutto bene al lavoro?","Everything OK at work?",""],
+["Tutto a posto","TOOT-to ah PO-sto","All good, all set","Tranquillo, è tutto a posto.","Relax, everything's fine.",""],
+["Tranquillo","tran-KWEEL-lo","Relax / no worries","Tranquillo, ce la facciamo.","Don't worry, we'll make it.","Said to a woman: tranquilla."],
+["Ce la faccio","cheh lah FAHT-cho","I can manage / I'll make it","Ce la faccio, grazie.","I can manage, thanks.","From farcela: to manage, to pull it off."],
+["Sbrigati!","ZBREE-gah-tee","Hurry up!","Sbrigati, il treno parte!","Hurry up, the train's leaving!",""],
+["il treno","eel TREH-no","the train","Il treno è in ritardo.","The train is late.",""],
+["in ritardo","een ree-TAR-do","late, delayed","Scusa, sono in ritardo.","Sorry, I'm running late.",""],
+["in anticipo","een ahn-TEE-chee-po","early, ahead of time","Oggi sono in anticipo!","Today I'm early!",""],
+["Buona giornata!","BWO-nah jor-NAH-tah","Have a good day!","Ciao, buona giornata!","Bye, have a good day!","In the evening: buona serata."],
+["Buon lavoro!","bwon lah-VO-ro","Have a good day at work!","Buon lavoro, a dopo!","Have a good shift, see you later!","Said to anyone heading to work."],
+["Grazie mille","GRAH-tsyeh MEEL-leh","Thanks so much","Grazie mille per l'aiuto.","Thanks so much for the help.","Literally \"a thousand thanks.\""],
+];
+const ITA_START = Date.UTC(2026, 9, 3) / 864e5;   // lesson 1 on Oct 3, 2026
+function speak(text){
+  try { const u = new SpeechSynthesisUtterance(text.replace(/[—…\/]/g, " ")); u.lang = "it-IT"; u.rate = .85;
+    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith("it")); if (v) u.voice = v;
+    speechSynthesis.cancel(); speechSynthesis.speak(u); } catch(e){}
+}
+const SPK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+function renderItalian(){
+  const n = ITA.length, day = Math.max(0, dayNum() - ITA_START), i = day % n, e = ITA[i], y = ITA[(i - 1 + n) % n];
+  $("ita").innerHTML = `<div class="ita-day">LESSON ${i + 1} OF ${n}</div>
+    <div class="ita-word"><b lang="it">${esc(e[0])}</b><button class="say" type="button" id="say" aria-label="Hear it">${SPK}</button></div>
+    <div class="ita-pron">${esc(e[1])}</div>
+    <button class="reveal" type="button" id="reveal">Think of the meaning, then tap</button>
+    <div class="ita-ans" id="itaAns" hidden>
+      <div class="ita-en">${esc(e[2])}</div>
+      <div class="ita-ex"><span lang="it">${esc(e[3])}</span><i>${esc(e[4])}</i></div>
+      ${e[5] ? `<div class="ita-note">${esc(e[5])}</div>` : ""}
+    </div>
+    ${day > 0 ? `<div class="ita-prev">Yesterday: <button type="button" id="prev" lang="it">${esc(y[0])}</button> <span id="prevAns" hidden>· ${esc(y[2])}</span></div>` : ""}`;
+  $("say").onclick = () => speak(e[0]);
+  $("reveal").onclick = () => { $("itaAns").hidden = false; $("reveal").hidden = true; };
+  if ($("prev")) $("prev").onclick = () => { $("prevAns").hidden = false; speak(y[0]); };
+}
+
+/* ---------- Good news (plus major events only) ---------- */
+const CATASTROPHE = /\b(earthquake|tsunami|hurricane|typhoon|cyclone|floods?|flooding|wildfires?|eruption|famine|pandemic|epidemic|outbreak|terror\w*|bombing|massacre|invasion|invades?|invaded|war|missile|airstrikes?|crash|collapse|explosion|mass shooting|killed|kills|dead|deaths|casualties)\b/i;
+async function loadMajor(){
+  for (const back of [0, 1]){
+    const d = new Date(Date.now() - back*864e5).toLocaleDateString("en-CA",{timeZone:tz}).replace(/-/g,"/");
+    const r = await fetch(`https://en.wikipedia.org/api/rest_v1/feed/featured/${d}`).catch(() => null);
+    if (!r || !r.ok) continue;
+    const j = await r.json(), items = [];
+    for (const n of j.news || []){
+      const text = new DOMParser().parseFromString(n.story || "", "text/html").body.textContent.trim();
+      if (CATASTROPHE.test(text)){ const lk = (n.links || [])[0]; items.push({ text, url: lk?.content_urls?.mobile?.page || lk?.content_urls?.desktop?.page || "" }); }
+    }
+    return items.slice(0, 1);
+  }
+  return [];
+}
+async function goodItems(){
+  if (!RELAY) return [];
+  const all = [];
+  for (const src of CONFIG.goodNews){
+    const r = await fetch(`${RELAY}/news?src=${src}`, {cache:"no-store"}).catch(() => null);
+    if (!r || !r.ok) continue;
+    const xml = new DOMParser().parseFromString(await r.text(), "application/xml");
+    const label = src === "gnn" ? "Good News Network" : "Positive News";
+    xml.querySelectorAll("item").forEach(i => all.push({ title: i.querySelector("title")?.textContent?.trim() || "",
+      link: i.querySelector("link")?.textContent?.trim() || "", date: Date.parse(i.querySelector("pubDate")?.textContent || "") || 0, label }));
+  }
+  return all.filter(i => i.title && /^https?:/.test(i.link)).sort((a,b) => b.date - a.date).slice(0, 3);
+}
+async function loadNews(){
+  const [major, good] = await Promise.all([loadMajor().catch(() => []), goodItems().catch(() => [])]);
+  if (!major.length && !good.length) return;
+  $("news").innerHTML = major.map(m => `<a class="major" href="${esc(m.url)}"><em>MAJOR NEWS</em>${esc(m.text)}</a>`).join("") +
+    (good.length ? `<button class="news-toggle" id="newsToggle" type="button" aria-expanded="false">${good.length} good-news ${good.length > 1 ? "stories" : "story"} <span>Show</span></button>
+      <div id="goodList" hidden>${good.map(i => `<a href="${esc(i.link)}">${esc(i.title)}<small>${esc(i.label)}</small></a>`).join("")}</div>` : "");
+  if ($("newsToggle")) $("newsToggle").onclick = () => { const g = $("goodList"); g.hidden = !g.hidden;
+    $("newsToggle").setAttribute("aria-expanded", !g.hidden); $("newsToggle").querySelector("span").textContent = g.hidden ? "Show" : "Hide"; };
+  $("newsWrap").hidden = false;
+}
+
+/* ---------- Font check: read four short passages, keep the font you read fastest ---------- */
+const FONTS = [["Manrope","Manrope"],["Atkinson Hyperlegible","Atkinson Hyperlegible"],["EB Garamond","EB Garamond"],["Montserrat","Montserrat"]];
+const PASSAGES = [
+  "Most cities wake up in layers. First come the delivery trucks and the early buses, moving through streets that still belong to the night. Then the bakeries switch on their lights, and the smell of bread drifts onto the sidewalk. By the time the sun clears the rooftops, the coffee lines have formed and the trains are full. Nobody plans this rhythm, yet it repeats every morning with surprising precision, like a song everyone learned without ever hearing it.",
+  "A river looks the same from one day to the next, but the water in it is always new. Engineers who study rivers pay attention to what stays constant: the shape of the banks, the slope of the bed, the places where the current slows and drops its sand. Over years, those quiet details decide where towns are built and where bridges stand. The surface changes constantly, but the patterns underneath move slowly enough to plan a life around.",
+  "Learning a new skill rarely feels like progress while it is happening. The first weeks bring small mistakes that seem to repeat endlessly, and it is easy to believe nothing is improving. Then, almost without warning, something that once took effort becomes automatic. Researchers call this consolidation, and much of it happens during sleep. The practice you did yesterday is still being organized tonight, which is one reason steady effort usually beats a single heroic push.",
+  "Old maps are full of beautiful errors. Coastlines bend the wrong way, islands appear that were never there, and whole mountain ranges drift hundreds of miles from their true location. Yet these maps were drawn by careful people working with the best information they had. Each new voyage corrected a little more, and slowly the picture sharpened. Seen together, the maps tell a second story, not about the world itself but about how patiently people learned to see it.",
+];
+const fontStack = f => `"${f}",-apple-system,"Segoe UI",system-ui,sans-serif`;
+function applyFont(){ try { const f = localStorage.getItem("bodyFont"); if (f) document.documentElement.style.setProperty("--body", fontStack(f)); } catch(e){} }
+function fontCheck(){
+  const order = FONTS.map((f,i) => [f, PASSAGES[i]]).sort(() => Math.random() - .5), results = [];
+  const box = document.createElement("div"); box.className = "fc"; box.setAttribute("role","dialog"); box.setAttribute("aria-modal","true");
+  document.body.appendChild(box);
+  const close = () => box.remove();
+  const intro = () => { box.innerHTML = `<div class="fc-in"><h3>Font check</h3>
+      <p>You'll read four short passages, each in a different font. Read at your normal pace, then tap Done. The page keeps the font you read fastest.</p>
+      <p style="color:var(--soft)">One run is a rough guide. Speed can vary with sleepiness, so it's worth repeating on a couple of mornings.</p>
+      <button class="fc-go" id="fcStart" type="button">Start</button><button class="fc-x" id="fcClose" type="button">Not now</button></div>`;
+    $("fcStart").onclick = () => step(0); $("fcClose").onclick = close; };
+  const step = k => {
+    if (k >= order.length) return done();
+    const [[label, fam], text] = order[k];
+    box.innerHTML = `<div class="fc-in"><div class="ita-day">PASSAGE ${k+1} OF ${order.length}</div>
+      <p class="fc-text" style="font-family:${fontStack(fam).replace(/"/g,"&quot;")}">${esc(text)}</p>
+      <button class="fc-go" id="fcDone" type="button">Done</button></div>`;
+    box.scrollTop = 0; const t0 = performance.now();
+    $("fcDone").onclick = () => { const mins = (performance.now() - t0) / 60000; results.push({ label, fam, wpm: Math.round(text.split(/\s+/).length / mins) }); step(k+1); };
+  };
+  const done = () => {
+    results.sort((a,b) => b.wpm - a.wpm); const best = results[0];
+    box.innerHTML = `<div class="fc-in"><h3>Your fastest: ${esc(best.label)}</h3>
+      ${results.map(r => `<div class="fc-row"><span style="font-family:${fontStack(r.fam).replace(/"/g,"&quot;")}">${esc(r.label)}</span><b>${r.wpm} wpm</b></div>`).join("")}
+      <p style="color:var(--soft)">Differences under about 10% are probably noise.</p>
+      <button class="fc-go" id="fcUse" type="button">Use ${esc(best.label)}</button>
+      <button class="fc-x" id="fcReset" type="button">Keep the default (Manrope)</button></div>`;
+    $("fcUse").onclick = () => { try { localStorage.setItem("bodyFont", best.fam); } catch(e){} applyFont(); close(); };
+    $("fcReset").onclick = () => { try { localStorage.removeItem("bodyFont"); } catch(e){} document.documentElement.style.removeProperty("--body"); close(); };
+  };
+  intro();
+}
+
+/* ---------- Greeting ---------- */
+function hello(){
+  const h = nyHour(), n = CONFIG.name;
+  return h < 5 ? `Up early, ${n}.` : h < 12 ? `Good morning, ${n}.` : h < 17 ? `Good afternoon, ${n}.` : `Good evening, ${n}.`;
+}
+function renderShift(){
+  const si = shiftInfo(), el = $("shift"), mode = document.documentElement.dataset.mode;
+  let txt = "";
+  if (mode === "dim" && si.tomorrow) txt = `Shift tomorrow at ${clock12(si.tomorrow.start)} · leave ${clock12(si.tomorrow.leave)}`;
+  else if (si.workToday){
+    const left = si.t.leave - si.now;
+    txt = left > 0 ? `Shift at ${clock12(si.t.start)} · leave by ${clock12(si.t.leave)} · ${left >= 60 ? Math.floor(left/60) + " hr " : ""}${left % 60} min`
+                   : `Time to head out · shift at ${clock12(si.t.start)}`;
+  }
+  el.textContent = txt; el.hidden = !txt;
+}
+function renderGreeting(){
+  $("gHi").textContent = hello();
+applyFont();
+renderItalian();
+$("fcBtn").addEventListener("click", fontCheck);
+setInterval(() => { renderShift(); if (currentMode() !== document.documentElement.dataset.mode){ applyMode(); renderGreeting(); } }, 60e3);
+  renderShift();
+  const out = [], w = S.wx, si = shiftInfo(), mode = document.documentElement.dataset.mode;
+  if (mode === "dim"){
+    $("gBody").textContent = `Early shift tomorrow, so the page is in wind-down mode. Turning your screen brightness down helps too.`;
+    return;
+  }
+  // Holidays
+  for (const x of S.holToday || []) out.push(/^Clocks/.test(x) ? `${x} today.` : `Happy ${x}.`);
+  // Weather
+  const rainy = w && [51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99].includes(w.code);
+  const wetSoon = w && !rainy && w.wet && w.wet.p >= 50 ? w.wet : null;
+  if (w){
+    let t = `It's ${w.temp}° and ${w.cond.toLowerCase()}`;
+    if (nyHour() < 13 && w.hi - w.temp >= 5) t += `, heading to ${w.hi}°`;
+    if (wetSoon) t += `, with rain likely around ${hourName(wetSoon.t)}`;
+    out.push(t + ".");
+  }
+  // Commute: bike if it's nice, otherwise the faster of the J and the B52
+  const rainSoon = w && w.hrs && w.hrs.slice(0, 3).some(x => x.p >= 60);   // within ~2 hours
+  const badBike = (w && (rainy || rainSoon || w.temp < 25 || w.wind >= 22)) || S.aqi > 150;
+  const j = S.train?.to?.[0], b = S.bus?.[0];
+  const transit = [j != null ? `the J comes in ${j} min` : "", b != null ? (j != null ? `the B52 in ${b}` : `the B52 comes in ${b} min`) : ""].filter(Boolean).join(" and ");
+  if (!si.workToday){ /* day off or shift already started: skip the commute */ }
+  else if (badBike){
+    if (transit) out.push(`Maybe skip the bike: ${transit}.`);
+  } else if (S.home){
+    const tot = S.home.c + S.home.e;
+    if (!S.home.renting || tot === 0) out.push(S.home.alt?.n ? `Your stop is empty, but ${S.home.alt.name} has ${S.home.alt.n} (${S.home.alt.walk}).` : `Your bike stop is empty.` + (transit ? ` ${transit[0].toUpperCase() + transit.slice(1)}.` : ""));
+    else if (tot <= 2) out.push(`Only ${tot} bike${tot>1?"s":""} left at your stop` + (S.home.alt?.n > tot ? `; ${S.home.alt.name} has ${S.home.alt.n}.` : "."));
+    else out.push(`Good bike weather, and your stop has ${S.home.c} classic${S.home.e ? ` and ${S.home.e} e-bike${S.home.e>1?"s":""}` : ""}.`);
+    if (S.work && S.work.docks <= 2) out.push(`Docks are tight near work` + (S.work.alt?.n > S.work.docks ? `, but ${S.work.alt.name.replace(/ (Ave|St|Pl)\b/g,"")} has ${S.work.alt.n}.` : "."));
+  }
+  // Light nudge on dark mornings
+  if (mode === "paper" && w?.sunrise) out.push(`The sun's up at ${clock12(toMin(w.sunrise.slice(11,16)))}, so turn on bright lights while you get ready.`);
+  if (S.aqi > 100) out.push(`Air quality is ${aqiCat(S.aqi)[0].toLowerCase()} today (AQI ${S.aqi}).`);
+  else if (w && w.uvMax >= 7 && nyHour() < 15) out.push(`UV gets high this afternoon.`);
+  // Service alerts
+  const al = (S.alerts || [])[0];
+  if (al) out.push(`Heads up: ${al.type ? al.type.toLowerCase() + " on the " + al.routes.join("/") : "service alert on the " + al.routes.join("/")}.`);
+  // Sports (at most two)
+  let sports = 0;
+  for (const {t, v} of S.teams || []){
+    if (!v || sports >= 2) continue; const i = v.info, nm = `The ${t.short || t.name}`;
+    if (i.live && i.liveScore){ out.push(`${nm} are playing now, ${i.liveScore.my}–${i.liveScore.op} vs ${i.liveScore.opp}.`); sports++; }
+    else if (i.last && i.lastDate && Date.now() - new Date(i.lastDate) < 20*3600e3){
+      out.push(i.last.won ? `${nm} beat ${i.last.opp} ${i.last.my}–${i.last.op}.` : `${nm} lost to ${i.last.opp} ${i.last.op}–${i.last.my}.`); sports++; }
+    else if (i.nextDate && dayKey(new Date(i.nextDate)) === dayKey(new Date())){
+      out.push(`${nm} play ${i.next.opp} at ${fmtTime(i.nextDate)}.`); sports++; }
+  }
+  for (const x of S.holTomorrow || []) out.push(/^Clocks/.test(x) ? `${x} tomorrow.` : `${x} is tomorrow.`);
+  $("gBody").textContent = out.slice(0, 6).join(" ");
+}
+
 /* ---------- Run ---------- */
 const fail = (id, html) => () => { $(id).innerHTML = html; };
 let busy = false, lastLoad = 0;
@@ -683,19 +1231,33 @@ async function loadAll(){
     loadWeather().catch(fail("wx", `<p class="msg">Weather didn't load. Tap refresh.</p>`)),
     loadBikes().catch(() => { $("home").innerHTML = `<p class="msg">Citi Bike didn't load. Tap refresh.</p>`; $("work").innerHTML = ""; }),
     loadBus().catch(e => { $("bus").innerHTML = `<div class="t-label">${ICON.bus}${esc(CONFIG.bus.label)}</div><p class="msg">Didn't load (${esc(e && e.message || "error")}). <a href="https://bustime.mta.info/m/?q=${CONFIG.bus.route}">Bus Time</a></p>`; }),
-    loadCoins().catch(fail("coins", `<p class="msg">Prices didn't load. Tap refresh.</p>`)),
+    loadCoins().catch(fail("ticker", `<p class="msg">Prices didn't load. Tap refresh.</p>`)),
+    loadAir().catch(() => {}),
+    loadTrain().catch(e => { $("train").innerHTML = `<div class="t-label">${ICON.train}<span class="bullet">J</span>${esc(CONFIG.train.toward)}</div><p class="msg">Didn't load (${esc(e && e.message || "error")}).</p>`; }),
+    loadAlerts().catch(() => {}),
+    loadNews().catch(() => {}),
     loadTeams(teamsP),
     loadMonth(teamsP).catch(() => {}),
     loadThought().catch(() => {}),
-    loadFact().catch(() => {}),
   ]);
+  applyMode();
+  // On days off (or once the shift has started), commute moves lower on the page
+  const cw = $("commuteWrap");
+  if (!shiftInfo().workToday) document.querySelector("main").insertBefore(cw, $("newsWrap"));
+  else document.querySelector("main").insertBefore(cw, $("teamsWrap"));
+  renderAlerts();
+  renderGreeting();
+  renderItalian();
   $("updated").textContent = new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
   $("refresh").classList.remove("spin"); busy = false;
 }
 // Sky before weather arrives: guess from the clock
+applyMode();
 (() => { const h = +new Date().toLocaleString("en-US",{timeZone:tz,hour:"numeric",hour12:false});
   const f = new URLSearchParams(location.search).get("wx"); applyTheme(f && THEMES[f] ? f : (h >= 7 && h < 19 ? "clear" : "night")); })();
 $("refresh").addEventListener("click", loadAll);
+$("gHi").textContent = hello();
+$("oura").href = "shortcuts://run-shortcut?name=" + encodeURIComponent(CONFIG.ouraShortcut);
 document.addEventListener("visibilitychange", () => { if (!document.hidden && Date.now() - lastLoad > 60e3) loadAll(); });
 loadAll();
 </script>
